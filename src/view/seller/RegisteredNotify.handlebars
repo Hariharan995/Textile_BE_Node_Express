@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unipick Mail Template</title>
+    <style>
+        table {
+            table-layout: fixed;
+        }
+
+        ul {
+            padding: 0;
+            margin: 0;
+            text-align: center;
+        }
+
+        ul li {
+            padding: 0 8px;
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="tableContent">
+        <table class="table" style="background: #fff; padding-top: 10px;" align="center" width="700" border="0"
+            cellspacing="0" cellpadding="0">
+
+            <tr>
+                <td align="left" style="padding-left: 10px;">
+                    <div style="border-bottom: 1px solid #ccc;">
+                        <h2
+                            style="margin: 10px; font-family:'Open Sans', Arial, sans-serif;color:#323232;font-weight:bold;font-size:21px;">
+                            Welcome to Unipick
+                        </h2>
+                    </div>
+
+                </td>
+            </tr>
+            <tr>
+                <td style="padding-top:10px; padding-bottom: 10px; padding-left: 20px; padding-right: 25px;"
+                    valign="top" bgcolor="#fff
+" align="center">
+                    <table align="center" width="650" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td align="left">
+                                <h2
+                                    style="margin: 0;font-family:'Open Sans', Arial, sans-serif;color:#323232;font-weight:600;font-size:16px;text-align: left;">
+                                   Namaste {{data.sellerName}},
+                                </h2>
+                                <p
+                                    style="font-family:'Open Sans', Arial, sans-serif;color:#000000;font-size:14px;text-align: left; margin: 0; padding-top: 10px;">
+                                    Thank you for registering with us! You are just a few steps away from being a
+                                    Unipick Seller.<br>Please complete your profile and get ready to upload your product
+                                    catalogue.<br>Visit <a href="{{data.UNIPICK_LINK}}" style="text-decoration: none; color: #69c6c8;">{{data.UNIPICK_LINK}}</a> and get started.
+                                </p> 
+                                <p
+                                    style="font-family:'Open Sans', Arial, sans-serif;color:#212121;text-align:left;font-size:14px; margin: 0; padding-top: 5px;">
+                                    At any point, if you need assistance, please write to us at <a href="mailto:{{data.EMAIL_CONNECT}}" style="text-decoration: none; color: #69c6c8;">{{data.EMAIL_CONNECT}}</a>
+                                </p>
+                                <p
+                                    style="font-family:'Open Sans', Arial, sans-serif;color:#212121;text-align:left;font-size:14px; margin: 0; padding-top: 10px;">
+                                    Best regards
+                                </p>
+                                <p
+                                    style="font-family:'Open Sans', Arial, sans-serif;color:#212121;font-weight:400;text-align:left;font-size:14px; margin: 0;padding-top: 10px;padding-bottom: 10px;">
+                                    Team Unipick
+                                </p>
+                            </td>
+                </td>
+            </tr>
+            <tr>
+                <td width="650">
+                    <h2
+                        style="font-family:'Open Sans', Arial, sans-serif;color:#8a8a8a;text-align:center;font-size:12px;margin-bottom:10px; font-weight: 500;">
+                        Unipick Commerce Private Limited, 21, Lake View Farm, Varthur Main Road, Whitefield, Bengaluru,
+                        Karnataka, 560066
+                    </h2>
+                </td>
+            </tr>
+            <tr>
+                <td width="650" style="border-top:1px solid #ccc;">
+                    <p
+                        style="font-family:'Open Sans', Arial, sans-serif;color:#666666;font-weight:500;text-align:center;font-size:14px;">
+                        <a href="{{data.PRIVACY_POLICY}}" style="text-decoration: none; color: #69c6c8;">Privacy
+                            Policy</a>
+                        |
+                        <a href="{{data.TERMS_OF_USE}}" style="text-decoration: none; color: #69c6c8;">Terms of use</a>
+                        |
+                        <a href="{{data.TERMS_TO_SELL}}" style="text-decoration: none; color: #69c6c8;">Terms to
+                            Sell</a>
+                    </p>
+                </td>
+            </tr>
+        </table>
+        </td>
+        </tr>
+
+        </table>
+    </div>
+</body>
+
+</html>
