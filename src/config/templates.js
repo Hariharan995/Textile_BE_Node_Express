@@ -1,5 +1,6 @@
 module.exports.EMAIL = {
-    SELLER_EMAIL_SUBJECT: {
+    ADMIN_EMAIL_SUBJECT: {
+        OTPVERIFYNOTIFY: 'OTP for registeration',
         REGISTEREDNOTIFY: 'Congratulations! {sellerName}, Welcome to the Unipick Family',
         NEWPASSWORDNOTIFY: 'Reset your Unipick Password',
         GSTVERIFIEDNOTIFY: 'Welcome to the Unipick Family!',
@@ -13,7 +14,7 @@ module.exports.EMAIL = {
         BULKPRODUCTADDEDNOTIFY: 'Congratulations! Your product has been successfully added',
         PRODUCTAPPROVEDNOTIFY: 'Congratulations! Your product has been approved',
         PRODUCTREJECTEDNOTIFY: 'Sorry! We need more information about your product to activate them',
-        CATALOGACTIVENOTIFY:'Unipick is now accepting orders from Customers',
+        CATALOGACTIVENOTIFY: 'Unipick is now accepting orders from Customers',
         LOWINVENTORYNOTIFY: 'Low Stock Alert!',
         PRICEUPDATEDNOTIFY: 'Your product price has been successfully updated',
         QUANTITYUPDATEDNOTIFY: 'Your product inventory has been successfully updated',
@@ -28,7 +29,8 @@ module.exports.EMAIL = {
         ORDERRETURNNOTIFY: 'Oops! You have a return order request on your product',
         ORDERSHIPPEDNOTIFY: 'Your order shipped successfully',
     },
-    SELLER_EMAIL_TEMPLATE: {
+    ADMIN_EMAIL_TEMPLATE: {
+        OTPVERIFYNOTIFY: 'OTPVerifyNotify',        
         REGISTEREDNOTIFY: 'RegisteredNotify',
         NEWPASSWORDNOTIFY: 'NewPasswordNotify',
         GSTVERIFIEDNOTIFY: 'GSTVerifiedNotify',

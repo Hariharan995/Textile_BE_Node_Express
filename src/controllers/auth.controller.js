@@ -1,5 +1,5 @@
 const { authService } = require('../services');
-const { signInSchema, signUpSchema, signOutSchema} = require('../validator/validation')
+const { signInSchema, signUpSchema, signOutSchema, deleteUser, refreshToken } = require('../validator/validation')
 const Authentication = require("../middleware/authentication");
 const { CONSTANT_MSG } = require('../config/constant_messages');
 
@@ -21,13 +21,7 @@ exports.login = async (req, res) => {
         await signInSchema.validateAsync(req.body);
         let user = await authService.login(req.body);
         if (user.status != 'error') {
-            let token;
-            if (req.body.isMobileApp) {
-                token = await Authentication.getJwtTokenForMbl(user.data);
-            } else {
-                token = await Authentication.getJwtToken(user.data);
-            }
-            user.token = token;
+            user.token = await Authentication.getJwtToken(user.data);
         }
         return res.status(user.statusCode).send(user);
     } catch (error) {
@@ -44,6 +38,29 @@ exports.logout = async (req, res) => {
         return res.status(user.statusCode).send(user);
     } catch (error) {
         console.log("Error in Logout API: ", error);
+        return res.status(500).send({ statusCode: 500, status: CONSTANT_MSG.STATUS.ERROR, message: error.message });
+    }
+};
+
+// deleteUser
+exports.deleteUser = async (req, res) => {
+    try {
+        await deleteUser.validateAsync(req.body);
+        const user = await authService.deleteUser(req.body);
+        return res.status(user.statusCode).send(user);
+    } catch (error) {
+        console.log("Error in deleteUser API: ", error);
+        return res.status(500).send({ statusCode: 500, status: CONSTANT_MSG.STATUS.ERROR, message: error.message });
+    }
+};
+
+exports.refreshToken = async (req, res) => {
+    try {
+        await refreshToken.validateAsync(req.body);
+        const refreshTokenDetails = await authService.refreshToken(req.body);
+        return res.status(refreshTokenDetails.statusCode).send(refreshTokenDetails);
+    } catch (error) {
+        console.log("Error in Refresh Token API: ", error);
         return res.status(500).send({ statusCode: 500, status: CONSTANT_MSG.STATUS.ERROR, message: error.message });
     }
 };
@@ -151,13 +168,3 @@ exports.logout = async (req, res) => {
 //     }
 // };
 
-// exports.refreshToken = async (req, res) => {
-//     try {
-//         await refreshToken.validateAsync(req.body);
-//         const refreshTokenDetails = await authService.refreshToken(req.body);
-//         return res.status(refreshTokenDetails.statusCode).send(refreshTokenDetails);
-//     } catch (error) {
-//         console.log("Error in Refresh Token API: ", error);
-//         return res.status(500).send({ statusCode: 500, status: CONSTANT_MSG.STATUS.ERROR, message: error.message });
-//     }
-// };

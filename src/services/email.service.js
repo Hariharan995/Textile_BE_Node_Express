@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 const path = require('path');
 const hbs = require('nodemailer-express-handlebars');
 exports.sendEmail = (details) => {
-    try {    
+    try {
         const fromEmail = details.data?.fromEmail ? details.data?.fromEmail : process.env.EMAIL_USERNAME
         let mailTransporter = nodemailer.createTransport({
             host: "smtp.gmail.com",
@@ -30,7 +30,7 @@ exports.sendEmail = (details) => {
         let mailDetails = {
             from: fromEmail,
             to: details.email,
-            subject: details.data.sellerName ? sellerSubject : buyerSubject,
+            subject: details.subject,
             template: details.template,
             context: {
                 data: details?.data,

@@ -34,12 +34,9 @@ paths:
                 mobile:
                   type: string
                   example: "1234567890"
-                countryCode:
-                  type: string
-                  example: "+91"
                 email:
                   type: string
-                  example: "jason@example.com"
+                  example: "mhariharanms@gmail.com"
                 password:
                   type: string
                   example: "Pass@123"
@@ -48,19 +45,13 @@ paths:
                   example: "Jack"
                 userRole: 
                   type: string
-                  example: "BUYER or SELLER or CURATOR"  
-                sellerType: 
-                  type: string
-                  example: "BY_REGISTER or BUYER_TO_SELLER or BY_STATIC"
-                referralCode:
-                  type: string
-                  example: "rxsq"               
+                  example: "SELLER"           
               required:   
                 - mobile            
                 - password
+                - email
                 - name
                 - userRole
-                - sellerType
       responses:
         "200":
           description: Success
@@ -91,44 +82,6 @@ paths:
               required:
                 - username
                 - password                
-      responses:
-        "200":
-          description: Success
-        "400":
-          description: Bad Request Error
-        "401":
-          description: Unauthorized Error
- 
-  /socialLogin:
-    post:
-      tags:
-      - "AUTHENDICATION"
-      description: ""
-      operationId: socialLogin     
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string  
-                  example: "xyz@gmail.com" 
-                name: 
-                  type: String
-                  example: "Jack"         
-                userRole: 
-                  type: String 
-                  example: "SELLER or BUYER"
-                sellerType: 
-                  type: string
-                  example: "BY_REGISTER or BUYER_TO_SELLER or BY_STATIC"                                                    
-              required:
-                - email
-                - name
-                - userRole  
-                - sellerType       
       responses:
         "200":
           description: Success
@@ -218,35 +171,6 @@ paths:
         "401":
           description: Unauthorized Error
 
-  /otpVerification:    
-    post:    
-      tags:
-      - "AUTHENDICATION"
-      description: ""
-      operationId: otpVerification      
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                mobileOtp:  
-                  type: string                                          
-                otp:  
-                  type: string                                                   
-              required:
-                - username                                           
-      responses:
-        "200":
-          description: Success
-        "400":
-          description: Bad Request Error
-        "401":
-          description: Unauthorized Error
-
   /resendOtp:
     post:
       tags:
@@ -298,56 +222,32 @@ paths:
         "401":
           description: Unauthorized Error
    
-  /getUserById: 
-    parameters:
-        - name: id
-          in: query
-          type: string
-          required: true
-        - name: isSeller
-          in: query
-          type: boolean
-          required: true  
-    get: 
+  /deleteUser:
+    delete:
       security:
-        - bearerAuth: []     
+        - bearerAuth: []
       tags:
-       - "USER"
-      operationId: getUserById   
+      - "ADMIN"
+      description: ""
+      operationId: deleteUser      
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string                          
+              required:
+                - userId                                     
       responses:
         "200":
           description: Success
         "400":
           description: Bad Request Error
         "401":
-          description: Unauthorized Error    
-
-  # /deleteUser:
-  #   delete:
-  #     security:
-  #       - bearerAuth: []
-  #     tags:
-  #     - "ADMIN"
-  #     description: ""
-  #     operationId: deleteUser      
-  #     requestBody:
-  #       required: true
-  #       content:
-  #         application/json:
-  #           schema:
-  #             type: object
-  #             properties:
-  #               userId:
-  #                 type: string                          
-  #             required:
-  #               - userId                                     
-  #     responses:
-  #       "200":
-  #         description: Success
-  #       "400":
-  #         description: Bad Request Error
-  #       "401":
-  #         description: Unauthorized Error
+          description: Unauthorized Error
  
   /getAllUsers:
     post:
@@ -371,12 +271,12 @@ paths:
                   properties:
                     userRole: 
                       type: string
-                    field: 
-                      type: string
-                    value: 
+                    searchValue: 
                       type: string
                     isActive:
                       type: boolean
+                    userStatus:
+                      type: string
                 sortObj:
                   type: object
                   properties:
