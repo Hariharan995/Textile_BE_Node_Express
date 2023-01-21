@@ -165,7 +165,7 @@ exports.getAllSales = async (req) => {
         return {
             statusCode: 200,
             status: CONSTANT_MSG.STATUS.SUCCESS,
-            message: CONSTANT_MSG.SALE.SALE_LIST,
+            message: CONSTANT_MSG.SALES.SALE_LIST,
             data: saleList || [],
             count: totalRecordsCount.length || 0
         };
