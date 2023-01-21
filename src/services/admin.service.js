@@ -88,11 +88,11 @@ exports.getAllProducts = async (req) => {
             };
             adminPipeline.push(filter_app);
         }
-        // adminPipeline.push({
-        //     $project: {
-        //         "_id": 1, "name": 1, "mobile": 1, "email": 1, "userRole": 1, "isVerified": 1, "isActive": 1, "userStatus": 1, "countryCode": 1, "isApproved": 1, "createdAt": 1, "updatedAt": 1,
-        //     }
-        // })
+        adminPipeline.push({
+            $project: {
+                "updatedAt": 0, "__v": 0
+            }
+        })
         if (sort_obj) {
             const sort_app =
             {
@@ -146,11 +146,11 @@ exports.getAllSales = async (req) => {
             };
             adminPipeline.push(filter_app);
         }
-        // adminPipeline.push({
-        //     $project: {
-        //         "_id": 1, "name": 1, "mobile": 1, "email": 1, "userRole": 1, "isVerified": 1, "isActive": 1, "userStatus": 1, "countryCode": 1, "isApproved": 1, "createdAt": 1, "updatedAt": 1,
-        //     }
-        // })
+        adminPipeline.push({
+            $project: {
+                "updatedAt": 0, "__v": 0
+            }
+        })
         if (sort_obj) {
             const sort_app =
             {
