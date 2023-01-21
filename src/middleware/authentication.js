@@ -40,40 +40,14 @@ module.exports.getJwtToken = async (req) => {
     return token;
 };
 
-module.exports.getJwtTokenForMbl = async (req) => {
-    const token = jwt.sign({ email: req.email, userRole: req.userRole, mobile: req.mobile, userId: req._id }, process.env.JWT_TOKEN_SECRET_KEY, { expiresIn: "90d" })
-    const Obj = {
-        token: token,
-        userId: req._id
+module.exports.checkUserRole = () => {
+    return async (req, res, next) => {
+        if (req.user.userRole.includes('ADMIN')) {
+            req.user.management = true
+        }
+        else {
+            return res.status(401).send({ statusCode: 401, status: CONSTANT_MSG.STATUS.ERROR, message: CONSTANT_MSG.ERROR_MSG.UNAUTHORIZED_ERROR });
+        }
+        next()
     }
-    const tokenSave = Token(Obj)
-    await tokenSave.save()
-    return token
 };
-
-module.exports.checkShipRocketToken = async (req, res, next) => {
-    if (req.headers["x-api-key"] === process.env.SHIPROKCET_TOKEN) {
-        next();
-    }
-    else {
-        console.log("webhooks order update token..", req.headers["x-api-key"])
-        return res.status(401).send({ statuCode: "401", message: CONSTANT_MSG.ERROR_MSG.UNAUTHORIZED_ERROR });
-    }
-}
-
-
-module.exports.emailTokenCheck = async (req, res, next) => {
-    const Token = req.query.token;
-    if (Token) {
-        jwt.verify(Token, process.env.JWT_TOKEN_SECRET_KEY, (err, user) => {
-            if (err) {
-                return res.status(401).send({ statuCode: 401, message: err.message, data: { isTokenExpired: true } });
-            } else {
-                next();
-            }
-        });
-    }
-    else {
-        return res.status(401).send({ statuCode: "401", message: "Invalid Request : Authentication Error" });
-    }
-}

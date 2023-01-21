@@ -1,7 +1,5 @@
 const joi = require('joi');
-const { min } = require('moment');
 const joiObjectId = require('joi-objectid')(joi)
-const { CONSTANT_MSG } = require('../config/constant_messages');
 
 module.exports.signUpSchema = joi.object({
     name: joi.string().min(3).max(30).required(),
@@ -21,7 +19,7 @@ module.exports.signOutSchema = joi.object({
 });
 
 module.exports.deleteUser = joi.object({
-    userId: joi.string().required()
+    userId: joiObjectId().required()
 });
 
 module.exports.getAllUsers = joi.object({
@@ -37,7 +35,7 @@ module.exports.getAllUsers = joi.object({
         name: joi.number().valid(-1, 1)
     }).max(1)
 });
- 
+
 module.exports.getAllProducts = joi.object({
     page: joi.number().min(1).required(),
     limit: joi.number().min(1).required(),
@@ -60,4 +58,62 @@ module.exports.getAllSales = joi.object({
         createdAt: joi.number().valid(-1, 1),
         name: joi.number().valid(-1, 1)
     }).max(1)
+});
+
+module.exports.addProduct = joi.object({
+    sellerId: joiObjectId().required(),
+    productName: joi.string().required(),
+    productImage: joi.string().required(),
+    barcodeId: joi.string().required(),
+    gender: joi.string().required().valid("MALE", "FEMALE"),
+    mrp: joi.number().min(1),
+    price: joi.number().min(1).required(),
+    quantity: joi.number().min(1).required(),
+    description: joi.string(),
+    brandName: joi.string(),
+    taxPercent: joi.number(),
+});
+
+module.exports.updateProduct = joi.object({
+    sellerId: joiObjectId().required(),
+    productId: joiObjectId().required(),
+    productName: joi.string(),
+    productImage: joi.string(),
+    barcodeId: joi.string(),
+    gender: joi.string().valid("MALE", "FEMALE"),
+    mrp: joi.number().min(1),
+    price: joi.number().min(1),
+    quantity: joi.number().min(1),
+    description: joi.string(),
+    brandName: joi.string(),
+    taxPercent: joi.number(),
+});
+
+module.exports.deleteProduct = joi.object({
+    productId: joiObjectId().required()
+});
+
+module.exports.getProductById = joi.object({
+    productId: joiObjectId().required()
+});
+
+module.exports.addToCart = joi.object({
+    userId: joiObjectId().required(),
+    barcodeId: joi.string().required(),
+});
+
+module.exports.deleteSingleCart = joi.object({
+    cartId: joiObjectId().required(),
+});
+
+module.exports.delelteAllCart = joi.object({
+    userId: joiObjectId().required(),
+});
+
+module.exports.getAllCarts = joi.object({
+    userId: joiObjectId().required()
+});
+
+module.exports.orderPlaced = joi.object({
+    userId: joiObjectId().required(),
 });

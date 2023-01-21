@@ -5,14 +5,38 @@ const productSchema = mongoose.Schema(
         productName: {
             type: String,
         },
-        userId: {
+        description: {
+            type: String,
+        },
+        brandName: {
+            type: String,
+        },
+        productImage: {
+            type: String,
+        },
+        productUrlId: {
+            type: String,
+        },
+        sellerId: {
             type: String,
         },
         mrp: {
             type: Number
         },
+        quantity: {
+            type: Number
+        },
         price: {
             type: Number
+        },
+        taxPercent: {
+            type: Number
+        },
+        barcodeId: {
+            type: String,
+        },
+        gender: {
+            type: String,
         },
     },
     {

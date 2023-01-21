@@ -7,6 +7,9 @@ const cartSchema = mongoose.Schema(
         },
         productId: {
             type: Number,
+        },
+        quantity: {
+            type: Number,
         }
     },
     {

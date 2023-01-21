@@ -5,6 +5,12 @@ const saleSchema = mongoose.Schema(
         orderNo: {
             type: String,
         },
+        userId:{
+            type: String,
+        },
+        itemCount: {
+            type: Number,
+        },
         totalAmount: {
             type: Number,
         },
