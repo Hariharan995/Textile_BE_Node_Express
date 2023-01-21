@@ -53,7 +53,7 @@ exports.deleteUser = async (req, res) => {
         return res.status(500).send({ statusCode: 500, status: CONSTANT_MSG.STATUS.ERROR, message: error.message });
     }
 };
-
+// Refresh Token
 exports.refreshToken = async (req, res) => {
     try {
         await refreshToken.validateAsync(req.body);

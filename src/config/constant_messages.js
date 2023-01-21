@@ -51,4 +51,26 @@ module.exports.CONSTANT_MSG = {
         USER_ACTIVITY_REMOVED: "User activity  removed successfully",
         USER_VERIFY: "USER VERIFIED"
     },
+    PRODUCT: {
+        PRODUCT_EXISTING: "User already exist",
+        PRODUCT_NOT_DETAILS: "No product found",
+        PRODUCT_LIST: "All product details fetch successfully",
+        PRODUCT_DETAILS: "Product details fetch successfully",
+        PRODUCT_REMOVED: "Product removed successfully",
+        PRODUCT_NOT_FOUND: "Product is not found",
+        PRODUCT_UPDATED: "Product updated successfully",
+        PRODUCT_INACTIVE_SUCCESSFULLY: 'Product Inactivated successfully',
+        PRODUCT_ACTIVATED_SUCCESSFULLY: 'Product Activated successfully',
+    },
+    SALE: {
+        SALE_EXISTING: "Sale already exist",
+        SALE_NOT_DETAILS: "No sale found",
+        SALE_LIST: "All sale details fetch successfully",
+        SALE_DETAILS: "Sale details fetch successfully",
+        SALE_REMOVED: "Sale removed successfully",
+        SALE_NOT_FOUND: "Sale is not found",
+        SALE_UPDATED: "Sale updated successfully",
+        SALE_INACTIVE_SUCCESSFULLY: 'Sale Inactivated successfully',
+        SALE_ACTIVATED_SUCCESSFULLY: 'Sale Activated successfully',
+    },
 }

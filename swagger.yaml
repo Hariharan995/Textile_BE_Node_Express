@@ -264,8 +264,6 @@ paths:
             schema:
               type: object
               properties:
-                agentId:
-                  type: string
                 filterObj:
                   type: object
                   properties:
@@ -276,6 +274,80 @@ paths:
                     isActive:
                       type: boolean
                     userStatus:
+                      type: string
+                sortObj:
+                  type: object
+                  properties:
+                    createdAt: 
+                      type: number   
+                page:
+                  type: number
+                limit:
+                  type: number                        
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Bad Request Error
+        "401":
+          description: Unauthorized Error  
+  
+  /getAllProducts:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+      - "ADMIN"
+      description: ""
+      operationId: getAllProducts 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filterObj:
+                  type: object
+                  properties:
+                    searchValue: 
+                      type: string
+                sortObj:
+                  type: object
+                  properties:
+                    createdAt: 
+                      type: number   
+                page:
+                  type: number
+                limit:
+                  type: number                        
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Bad Request Error
+        "401":
+          description: Unauthorized Error  
+  
+  /getAllSales:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+      - "ADMIN"
+      description: ""
+      operationId: getAllSales 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filterObj:
+                  type: object
+                  properties:
+                    searchValue: 
                       type: string
                 sortObj:
                   type: object

@@ -36,4 +36,28 @@ module.exports.getAllUsers = joi.object({
         createdAt: joi.number().valid(-1, 1),
         name: joi.number().valid(-1, 1)
     }).max(1)
-})
+});
+ 
+module.exports.getAllProducts = joi.object({
+    page: joi.number().min(1).required(),
+    limit: joi.number().min(1).required(),
+    filterObj: joi.object({
+        searchValue: joi.string()
+    }),
+    sortObj: joi.object({
+        createdAt: joi.number().valid(-1, 1),
+        name: joi.number().valid(-1, 1)
+    }).max(1)
+});
+
+module.exports.getAllSales = joi.object({
+    page: joi.number().min(1).required(),
+    limit: joi.number().min(1).required(),
+    filterObj: joi.object({
+        searchValue: joi.string()
+    }),
+    sortObj: joi.object({
+        createdAt: joi.number().valid(-1, 1),
+        name: joi.number().valid(-1, 1)
+    }).max(1)
+});
