@@ -16,6 +16,7 @@ const userSchema = mongoose.Schema(
         },
         userRole: {
             type: Array,
+            default: "SELLER"
         },
         userStatus: {
             type: String,

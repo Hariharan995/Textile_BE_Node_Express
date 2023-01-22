@@ -36,6 +36,8 @@ module.exports.CONSTANT_MSG = {
         USER_REMOVED: "User removed successfully",
         USER_NOT_FOUND: "User is not found",
         USER_UPDATED: "User updated successfully",
+        USER_APPROVED_SUCCESSFULLY: 'User approved successfully',
+        USER_REJECTED_SUCCESSFULLY: 'User rejected successfully',
         USER_INACTIVE_SUCCESSFULLY: 'User Inactivated successfully',
         USER_ACTIVATED_SUCCESSFULLY: 'User Activated successfully',
         USER_NOT_SELLER: 'User is not a Seller',

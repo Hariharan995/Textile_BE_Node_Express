@@ -177,3 +177,28 @@ exports.getAllSales = async (req) => {
         };
     }
 };
+
+exports.userApproval = async (reqBody) => {
+    try {
+        const user = await User.findOne({ _id: ObjectID(reqBody.userId) })
+        if (!user) {
+            return {
+                statusCode: 400,
+                status: CONSTANT_MSG.STATUS.ERROR,
+                message: CONSTANT_MSG.USER.USER_NOT_FOUND
+            }
+        }
+        await User.updateOne({ _id: ObjectID(reqBody.userId) }, reqBody)
+        return {
+            statusCode: 200,
+            status: CONSTANT_MSG.STATUS.SUCCESS,
+            message: reqBody.userStatus == "APPROVED" ? CONSTANT_MSG.USER.USER_APPROVED_SUCCESSFULLY : CONSTANT_MSG.USER.USER_REJECTED_SUCCESSFULLY
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+            status: CONSTANT_MSG.STATUS.ERROR,
+            message: error.message,
+        };
+    }
+};

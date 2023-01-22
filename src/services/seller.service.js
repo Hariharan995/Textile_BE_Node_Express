@@ -129,7 +129,8 @@ exports.addToCart = async (reqBody) => {
         }
         const cart = await Cart.findOne({ userId: reqBody.userId, barcodeId: reqBody.barcodeId })
         if (cart) {
-            await Cart.updateOne({ userId: reqBody.userId, barcodeId: reqBody.barcodeId }, { $inc: { quantity: 1 } })
+            let quantityChange = reqBody.type === 'DECREASE' ? -1 : 1
+            await Cart.updateOne({ userId: reqBody.userId, barcodeId: reqBody.barcodeId }, { $inc: { quantity: quantityChange } })
             return {
                 statusCode: 200,
                 status: CONSTANT_MSG.STATUS.SUCCESS,
@@ -206,12 +207,6 @@ exports.getAllCarts = async (reqBody) => {
             {
                 $lookup: {
                     from: 'Product', localField: 'barcodeId', foreignField: 'barcodeId',
-                    pipeline: [{
-                        $project: {
-                            productName: 1, description: 1,
-                            sellerId: 1, brandName: 1, productImages: 1, taxPercent: 1
-                        }
-                    }],
                     as: 'productDetails'
                 },
             },
@@ -222,17 +217,17 @@ exports.getAllCarts = async (reqBody) => {
         let subTotal = 0
         let totalTax = 0
         for (const element of cart) {
-            mrpTotal += element.productDetails.mrp
-            priceTotal += element.productDetails.price
-            subTotal += element.productDetails.price
+            mrpTotal += element.productDetails.mrp * element.quantity
+            priceTotal += element.productDetails.price * element.quantity
+            subTotal += element.productDetails.price * element.quantity
         }
 
         let cartObj = {
             cartLists: cart,
             payment: {
                 itemCount: cart.length,
-                mrpTotal: mrpTotal,
-                priceTotal: priceTotal,
+                mrpTotal: (mrpTotal).toFixed(2),
+                priceTotal: (priceTotal).toFixed(2),
                 subTotal: Number(subTotal.toFixed(2)),
                 totalAmount: (subTotal).toFixed(2),
             },

@@ -6,7 +6,6 @@ module.exports.signUpSchema = joi.object({
     email: joi.string().max(75).valid("mhariharanms@gmail.com"),
     mobile: joi.string().min(10),
     password: joi.string().min(6).max(30),
-    userRole: joi.string().required().valid('SELLER'),
 });
 
 module.exports.signInSchema = joi.object({
@@ -60,6 +59,11 @@ module.exports.getAllSales = joi.object({
     }).max(1)
 });
 
+module.exports.userApproval = joi.object({
+    userId: joiObjectId().required(),
+    userStatus: joi.string().valid('APPROVED', 'REJECTED').required()
+})
+
 module.exports.addProduct = joi.object({
     sellerId: joiObjectId().required(),
     productName: joi.string().required(),
@@ -100,6 +104,7 @@ module.exports.getProductById = joi.object({
 module.exports.addToCart = joi.object({
     userId: joiObjectId().required(),
     barcodeId: joi.string().required(),
+    type: joi.string().valid('INCREASE', 'DECREASE')
 });
 
 module.exports.deleteSingleCart = joi.object({

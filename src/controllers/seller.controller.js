@@ -60,8 +60,8 @@ exports.addToCart = async (req, res) => {
 
 exports.deleteSingleCart = async (req, res) => {
     try {
-        await deleteSingleCart.validateAsync(req.query)
-        const userList = await sellerService.deleteSingleCart(req.query);
+        await deleteSingleCart.validateAsync(req.body)
+        const userList = await sellerService.deleteSingleCart(req.body);
         return res.status(userList.statusCode).send(userList)
     } catch (error) {
         console.log("Error in deleteSingleCart API: ", error);
@@ -71,8 +71,8 @@ exports.deleteSingleCart = async (req, res) => {
 
 exports.delelteAllCart = async (req, res) => {
     try {
-        await delelteAllCart.validateAsync(req.query)
-        const userList = await sellerService.delelteAllCart(req.query);
+        await delelteAllCart.validateAsync(req.body)
+        const userList = await sellerService.delelteAllCart(req.body);
         return res.status(userList.statusCode).send(userList)
     } catch (error) {
         console.log("Error in delelteAllCart API: ", error);
@@ -82,8 +82,8 @@ exports.delelteAllCart = async (req, res) => {
 
 exports.getAllCarts = async (req, res) => {
     try {
-        await getAllCarts.validateAsync(req.query)
-        const userList = await sellerService.getAllCarts(req.query);
+        await getAllCarts.validateAsync(req.body)
+        const userList = await sellerService.getAllCarts(req.body);
         return res.status(userList.statusCode).send(userList)
     } catch (error) {
         console.log("Error in getAllCarts API: ", error);

@@ -1,5 +1,5 @@
 const { adminService } = require('../services');
-const { getAllUsers, getAllProducts, getAllSales } = require('../validator/validation')
+const { getAllUsers, getAllProducts, getAllSales, userApproval } = require('../validator/validation')
 const Authentication = require("../middleware/authentication");
 const { CONSTANT_MSG } = require('../config/constant_messages');
 
@@ -33,6 +33,17 @@ exports.getAllSales = async (req, res) => {
         return res.status(userList.statusCode).send(userList)
     } catch (error) {
         console.log("Error in getAllUsers API: ", error);
+        return res.status(500).send({ statusCode: 500, status: CONSTANT_MSG.STATUS.ERROR, message: error.message });
+    }
+};
+
+exports.userApproval = async (req, res) => {
+    try {
+        await userApproval.validateAsync(req.body)
+        const userList = await adminService.userApproval(req.body);
+        return res.status(userList.statusCode).send(userList)
+    } catch (error) {
+        console.log("Error in userApproval API: ", error);
         return res.status(500).send({ statusCode: 500, status: CONSTANT_MSG.STATUS.ERROR, message: error.message });
     }
 };

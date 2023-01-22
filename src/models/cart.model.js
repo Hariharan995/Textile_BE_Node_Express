@@ -6,10 +6,13 @@ const cartSchema = mongoose.Schema(
             type: String,
         },
         productId: {
-            type: Number,
+            type: String,
         },
         quantity: {
             type: Number,
+        },
+        barcodeId: {
+            type: String,
         }
     },
     {
