@@ -27,8 +27,8 @@ exports.updateProduct = async (req, res) => {
 
 exports.deleteProduct = async (req, res) => {
     try {
-        await deleteProduct.validateAsync(req.query)
-        const product = await sellerService.deleteProduct(req.query);
+        await deleteProduct.validateAsync(req.body)
+        const product = await sellerService.deleteProduct(req.body);
         return res.status(product.statusCode).send(product)
     } catch (error) {
         console.log("Error in deleteProduct API: ", error);
@@ -38,8 +38,8 @@ exports.deleteProduct = async (req, res) => {
 
 exports.getProductById = async (req, res) => {
     try {
-        await getProductById.validateAsync(req.query)
-        const product = await sellerService.getProductById(req.query);
+        await getProductById.validateAsync(req.body)
+        const product = await sellerService.getProductById(req.body);
         return res.status(product.statusCode).send(product)
     } catch (error) {
         console.log("Error in getProductById API: ", error);

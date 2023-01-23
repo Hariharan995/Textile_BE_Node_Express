@@ -8,7 +8,7 @@ const productSchema = mongoose.Schema(
         description: {
             type: String,
         },
-        brandName: {
+        brand: {
             type: String,
         },
         productImage: {

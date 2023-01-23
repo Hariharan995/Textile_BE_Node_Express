@@ -28,7 +28,7 @@ module.exports.getAllUsers = joi.object({
         userRole: joi.string().valid("SELLER", "ADMIN").allow(''),
         searchValue: joi.string().allow(''),
         userStatus: joi.string().valid("APPROVED", "UNAPPROVED", "REJECTED").allow(''),
-        startDate:  joi.string().allow(''),
+        startDate: joi.string().allow(''),
         endDate: joi.string().allow(''),
     }),
     sortObj: joi.object({
@@ -42,7 +42,7 @@ module.exports.getAllProducts = joi.object({
     limit: joi.number().min(1).required(),
     filterObj: joi.object({
         searchValue: joi.string().allow(''),
-        startDate:  joi.string().allow(''),
+        startDate: joi.string().allow(''),
         endDate: joi.string().allow(''),
     }),
     sortObj: joi.object({
@@ -73,12 +73,12 @@ module.exports.addProduct = joi.object({
     productName: joi.string().required(),
     productImage: joi.string().required(),
     barcodeId: joi.string().required(),
-    gender: joi.string().required().valid("MALE", "FEMALE"),
+    gender: joi.string().required().valid("MALE", "FEMALE", "CHILD"),
     mrp: joi.number().min(1),
     price: joi.number().min(1).required(),
     quantity: joi.number().min(1).required(),
     description: joi.string(),
-    brandName: joi.string(),
+    brand: joi.string(),
     taxPercent: joi.number(),
 });
 
@@ -88,12 +88,12 @@ module.exports.updateProduct = joi.object({
     productName: joi.string(),
     productImage: joi.string(),
     barcodeId: joi.string(),
-    gender: joi.string().valid("MALE", "FEMALE"),
+    gender: joi.string().valid("MALE", "FEMALE", "CHILD"),
     mrp: joi.number().min(1),
     price: joi.number().min(1),
     quantity: joi.number().min(1),
     description: joi.string(),
-    brandName: joi.string(),
+    brand: joi.string(),
     taxPercent: joi.number(),
 });
 
