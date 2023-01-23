@@ -1,6 +1,7 @@
 const { CONSTANT_MSG } = require('../config/constant_messages');
 const { User, Product, Sale } = require('../models');
 const moment = require("moment");
+const ObjectID = require('mongodb').ObjectId;
 
 exports.getAllUsers = async (req) => {
     try {
