@@ -228,7 +228,7 @@ exports.getAllCarts = async (reqBody) => {
                 itemCount: cart.length,
                 mrpTotal: (mrpTotal).toFixed(2),
                 priceTotal: (priceTotal).toFixed(2),
-                subTotal: Number(subTotal.toFixed(2)),
+                subTotal: (subTotal.toFixed(2)),
                 totalAmount: (subTotal).toFixed(2),
             },
             cartCount: cart.length

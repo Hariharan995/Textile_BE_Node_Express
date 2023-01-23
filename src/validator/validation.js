@@ -25,9 +25,11 @@ module.exports.getAllUsers = joi.object({
     page: joi.number().min(1).required(),
     limit: joi.number().min(1).required(),
     filterObj: joi.object({
-        userRole: joi.string().valid("SELLER"),
-        searchValue: joi.string(),
-        userStatus: joi.string().valid("APPROVED", "UNAPPROVED"),
+        userRole: joi.string().valid("SELLER", "ADMIN").allow(''),
+        searchValue: joi.string().allow(''),
+        userStatus: joi.string().valid("APPROVED", "UNAPPROVED", "REJECTED").allow(''),
+        startDate:  joi.string().allow(''),
+        endDate: joi.string().allow(''),
     }),
     sortObj: joi.object({
         createdAt: joi.number().valid(-1, 1),
@@ -39,7 +41,9 @@ module.exports.getAllProducts = joi.object({
     page: joi.number().min(1).required(),
     limit: joi.number().min(1).required(),
     filterObj: joi.object({
-        searchValue: joi.string()
+        searchValue: joi.string().allow(''),
+        startDate:  joi.string().allow(''),
+        endDate: joi.string().allow(''),
     }),
     sortObj: joi.object({
         createdAt: joi.number().valid(-1, 1),

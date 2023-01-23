@@ -1,5 +1,6 @@
 const { CONSTANT_MSG } = require('../config/constant_messages');
 const { User, Product, Sale } = require('../models');
+const moment = require("moment");
 
 exports.getAllUsers = async (req) => {
     try {
@@ -7,8 +8,23 @@ exports.getAllUsers = async (req) => {
         const limit = req.body.limit;
         const skip = (page - 1) * limit;
         let sort_obj = req.body.sortObj;
+        let filterObj = req.body.filterObj
         let filter_obj = {};
         let adminPipeline = [];
+
+        if (filterObj && (filterObj.startDate && filterObj.endDate)) {
+            if (filterObj.endDate) {
+                endDate = new Date(filterObj.endDate);
+                endDate.setDate(endDate.getDate() + 1);
+                endDate = moment(endDate, "YYYY-MM-DD").toISOString()
+                endDate = endDate.slice(0, endDate.length - 1)
+            }
+            if (filterObj.startDate) {
+                filterObj.startDate = moment(filterObj.startDate, "YYYY-MM-DD").toISOString()
+                filterObj.startDate = filterObj.startDate.slice(0, filterObj.startDate.length - 1)
+            }
+            filter_obj.createdAt = { '$gte': new Date(filterObj.startDate), '$lte': new Date(endDate) }
+        }
 
         if (req.body.filterObj && req.body.filterObj?.searchValue) {
             filter_obj = {
@@ -73,11 +89,29 @@ exports.getAllProducts = async (req) => {
         let sort_obj = req.body.sortObj;
         let filter_obj = {};
         let adminPipeline = [];
+        let filterObj = req.body.filterObj
 
+        if (filterObj && (filterObj.startDate && filterObj.endDate)) {
+            if (filterObj.endDate) {
+                endDate = new Date(filterObj.endDate);
+                endDate.setDate(endDate.getDate() + 1);
+                endDate = moment(endDate, "YYYY-MM-DD").toISOString()
+                endDate = endDate.slice(0, endDate.length - 1)
+            }
+            if (filterObj.startDate) {
+                filterObj.startDate = moment(filterObj.startDate, "YYYY-MM-DD").toISOString()
+                filterObj.startDate = filterObj.startDate.slice(0, filterObj.startDate.length - 1)
+            }
+            filter_obj.createdAt = { '$gte': new Date(filterObj.startDate), '$lte': new Date(endDate) }
+        }
         if (req.body.filterObj && req.body.filterObj?.searchValue) {
             filter_obj = {
                 $or: [
-                    { productName: { $regex: req.body.filterObj.searchValue, $options: 'i' } }
+                    { productName: { $regex: req.body.filterObj.searchValue, $options: 'i' } },
+                    { mrp: { $regex: req.body.filterObj.searchValue, $options: 'i' } },
+                    { price: { $regex: req.body.filterObj.searchValue, $options: 'i' } },
+                    { brand: { $regex: req.body.filterObj.searchValue, $options: 'i' } },
+                    { barcodeId: { $regex: req.body.filterObj.searchValue, $options: 'i' } }
                 ]
             }
         }
