@@ -80,6 +80,7 @@ module.exports.CONSTANT_MSG = {
         INVENTORY_AVAILABLE: 'Inventories are available'
     },
     SALES: {
+        ORDER_PLACED: 'Order placed successfully',
         SALE_EXISTING: "Sales already exist",
         SALE_NOT_DETAILS: "No sale found",
         SALE_LIST: "All sales details fetch successfully",

@@ -210,6 +210,7 @@ exports.getAllCarts = async (reqBody) => {
                     as: 'productDetails'
                 },
             },
+            { $match: { 'productDetails': { $ne: [] } } },
             { $unwind: { path: "$productDetails", preserveNullAndEmptyArrays: true } },
         ])
         let mrpTotal = 0
@@ -250,10 +251,59 @@ exports.getAllCarts = async (reqBody) => {
 
 exports.orderPlaced = async (reqBody) => {
     try {
+        const orderNo = await orderNoVerify();
+        let productList = [];
+        let subTotal = 0, mrpTotal = 0, priceTotal = 0, totalAmount = 0;
+        const cartList = await Cart.aggregate([
+            { $match: { userId: reqBody.sellerId } },
+            {
+                $lookup: {
+                    from: 'Product', localField: 'barcodeId', foreignField: 'barcodeId',
+                    as: 'productDetails'
+                },
+            },
+            { $match: { 'productDetails': { $ne: [] } } },
+            { $unwind: { path: "$productDetails", preserveNullAndEmptyArrays: true } },
+        ])
+        if (cartList.length === 0) {
+            return {
+                statusCode: 400,
+                status: CONSTANT_MSG.STATUS.ERROR,
+                message: CONSTANT_MSG.CART.CART_NOT_FOUND
+            }
+        }
+        for (const element of cartList) {
+            let product = {
+                productId: element.productDetails._id,
+                productName: element.productDetails.productName,
+                productImage: element.productDetails.productImage,
+                mrp: element.productDetails.mrp,
+                price: element.productDetails.price,
+                barcodeId: element.productDetails.barcodeId,
+                quantity: element.quantity,
+            }
+            productList.push(product)
+            mrpTotal += element.productDetails.mrp * element.quantity
+            priceTotal += element.productDetails.price * element.quantity
+            subTotal += element.productDetails.price * element.quantity
+        }
+        let order = {
+            orderNo: orderNo,
+            sellerId: reqBody.sellerId,
+            productList: productList,
+            itemCount: productList.length,
+            mrpTotal: Number(mrpTotal.toFixed(2)),
+            priceTotal: Number(priceTotal.toFixed(2)),
+            subTotal: Number(subTotal.toFixed(2)),
+            totalAmount: Number(subTotal.toFixed(2))
+        }
+        order = new Sale(order)
+        await order.save()
+        await Cart.deleteMany({ userId: reqBody.sellerId })
         return {
             statusCode: 200,
             status: CONSTANT_MSG.STATUS.SUCCESS,
-            message: CONSTANT_MSG.USER.USER_LIST
+            message: CONSTANT_MSG.SALES.ORDER_PLACED
         };
     } catch (error) {
         return {
@@ -263,3 +313,20 @@ exports.orderPlaced = async (reqBody) => {
         };
     }
 };
+
+const orderNoVerify = async () => {
+    const orderNo = Math.floor(1000000000 + Math.random() * 9000000000);;
+    const order = await dbCheck(orderNo, 'orderNo');
+    if (!order) {
+        orderNoVerify();
+    }
+    return orderNo;
+}
+
+const dbCheck = async (verifyNo, verifyType) => {
+    const order = await Sale.findOne({ orderNo: verifyNo })
+    if (order) {
+        return false
+    }
+    return true
+}

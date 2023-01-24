@@ -5,16 +5,25 @@ const saleSchema = mongoose.Schema(
         orderNo: {
             type: String,
         },
-        userId:{
+        sellerId: {
             type: String,
+        },
+        productList: {
+            type: Array,
         },
         itemCount: {
             type: Number,
         },
-        totalAmount: {
+        priceTotal: {
+            type: Number,
+        },
+        mrpTotal: {
             type: Number,
         },
         subTotal: {
+            type: Number,
+        },
+        totalAmount: {
             type: Number,
         },
     },

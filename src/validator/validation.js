@@ -55,7 +55,9 @@ module.exports.getAllSales = joi.object({
     page: joi.number().min(1).required(),
     limit: joi.number().min(1).required(),
     filterObj: joi.object({
-        searchValue: joi.string()
+        searchValue: joi.string().allow(''),
+        startDate: joi.string().allow(''),
+        endDate: joi.string().allow(''),
     }),
     sortObj: joi.object({
         createdAt: joi.number().valid(-1, 1),
@@ -124,5 +126,5 @@ module.exports.getAllCarts = joi.object({
 });
 
 module.exports.orderPlaced = joi.object({
-    userId: joiObjectId().required(),
+    sellerId: joiObjectId().required(),
 });

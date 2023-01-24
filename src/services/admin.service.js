@@ -162,14 +162,26 @@ exports.getAllSales = async (req) => {
         const skip = (page - 1) * limit;
         let sort_obj = req.body.sortObj;
         let filter_obj = {};
-        let adminPipeline = [];
+        let adminPipeline = [{
+            $addFields: {
+                sellerObjId: { $toObjectId: "$sellerId" },
+            }
+        },
+        {
+            $lookup: {
+                from: 'User', localField: 'sellerObjId', foreignField: '_id',
+                pipeline: [{ $project: { _id: 1, name: 1, mobile: 1 } }],
+                as: 'sellerDetails'
+            },
+        },
+        { $unwind: { path: "$sellerDetails", preserveNullAndEmptyArrays: true } },
+        ];
 
         if (req.body.filterObj && req.body.filterObj?.searchValue) {
             filter_obj = {
                 $or: [
-                    // { email: { $regex: req.body.filterObj.searchValue, $options: 'i' } },
-                    // { mobile: { $regex: req.body.filterObj.searchValue, $options: 'i' } },
-                    // { name: { $regex: req.body.filterObj.searchValue, $options: 'i' } }
+                    { orderNo: { $regex: req.body.filterObj.searchValue, $options: 'i' } },
+                    { totalAmount: { $regex: req.body.filterObj.searchValue, $options: 'i' } },
                 ]
             }
         }
