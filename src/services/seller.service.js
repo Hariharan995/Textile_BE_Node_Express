@@ -314,6 +314,31 @@ exports.orderPlaced = async (reqBody) => {
     }
 };
 
+exports.deleteOrder = async (reqBody) => {
+    try {
+        const order = await Sale.findOne({ _id: ObjectID(reqBody.orderId) })
+        if (!order) {
+            return {
+                statusCode: 400,
+                status: CONSTANT_MSG.STATUS.ERROR,
+                message: CONSTANT_MSG.SALES.SALE_NOT_DETAILS
+            };
+        }
+        await Sale.deleteOne({ _id: ObjectID(reqBody.orderId) })
+        return {
+            statusCode: 200,
+            status: CONSTANT_MSG.STATUS.SUCCESS,
+            message: CONSTANT_MSG.SALES.SALE_REMOVED
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+            status: CONSTANT_MSG.STATUS.ERROR,
+            message: error.message,
+        };
+    }
+};
+
 const orderNoVerify = async () => {
     const orderNo = Math.floor(1000000000 + Math.random() * 9000000000);;
     const order = await dbCheck(orderNo, 'orderNo');

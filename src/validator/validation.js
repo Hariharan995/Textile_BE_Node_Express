@@ -128,3 +128,7 @@ module.exports.getAllCarts = joi.object({
 module.exports.orderPlaced = joi.object({
     sellerId: joiObjectId().required(),
 });
+
+module.exports.deleteOrder = joi.object({
+    orderId: joiObjectId().required(),
+});

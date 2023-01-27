@@ -41,5 +41,6 @@ router.post('/deleteSingleCart', Authentication.checkJwtToken, sellerController.
 router.post('/delelteAllCart', Authentication.checkJwtToken, sellerController.delelteAllCart);
 router.post('/getAllCarts', Authentication.checkJwtToken, sellerController.getAllCarts);
 router.post('/orderPlaced', Authentication.checkJwtToken, sellerController.orderPlaced);
+router.post('/deleteSale', Authentication.checkJwtToken, Authentication.checkUserRole(), sellerController.deleteOrder);
 
 module.exports = router;

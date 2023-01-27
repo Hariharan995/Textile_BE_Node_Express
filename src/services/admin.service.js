@@ -1,6 +1,7 @@
 const { CONSTANT_MSG } = require('../config/constant_messages');
 const { User, Product, Sale } = require('../models');
 const moment = require("moment");
+const e = require('cors');
 const ObjectID = require('mongodb').ObjectId;
 
 exports.getAllUsers = async (req) => {
@@ -61,6 +62,9 @@ exports.getAllUsers = async (req) => {
                 $sort: sort_obj
             };
             adminPipeline.push(sort_app)
+        }
+        else {
+            adminPipeline.push({$sort: {"createdAt": -1}})
         }
         const totalRecordsCount = await User.aggregate(adminPipeline)
         adminPipeline.push({ $skip: skip });
@@ -135,6 +139,9 @@ exports.getAllProducts = async (req) => {
             };
             adminPipeline.push(sort_app)
         }
+        else {
+            adminPipeline.push({$sort: {"createdAt": -1}})
+        }
         const totalRecordsCount = await Product.aggregate(adminPipeline)
         adminPipeline.push({ $skip: skip });
         adminPipeline.push({ $limit: limit });
@@ -204,6 +211,9 @@ exports.getAllSales = async (req) => {
                 $sort: sort_obj
             };
             adminPipeline.push(sort_app)
+        }        
+        else {
+            adminPipeline.push({$sort: {"createdAt": -1}})
         }
         const totalRecordsCount = await Sale.aggregate(adminPipeline)
         adminPipeline.push({ $skip: skip });

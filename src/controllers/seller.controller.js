@@ -1,5 +1,6 @@
 const { sellerService } = require('../services');
-const { addProduct, updateProduct, deleteProduct, getProductById, addToCart, deleteSingleCart, delelteAllCart, getAllCarts, orderPlaced } = require('../validator/validation')
+const { addProduct, updateProduct, deleteProduct, getProductById, addToCart, deleteSingleCart, delelteAllCart,
+     getAllCarts, orderPlaced , deleteOrder} = require('../validator/validation')
 const { CONSTANT_MSG } = require('../config/constant_messages');
 
 
@@ -61,8 +62,8 @@ exports.addToCart = async (req, res) => {
 exports.deleteSingleCart = async (req, res) => {
     try {
         await deleteSingleCart.validateAsync(req.body)
-        const userList = await sellerService.deleteSingleCart(req.body);
-        return res.status(userList.statusCode).send(userList)
+        const cart = await sellerService.deleteSingleCart(req.body);
+        return res.status(cart.statusCode).send(cart)
     } catch (error) {
         console.log("Error in deleteSingleCart API: ", error);
         return res.status(500).send({ statusCode: 500, status: CONSTANT_MSG.STATUS.ERROR, message: error.message });
@@ -72,8 +73,8 @@ exports.deleteSingleCart = async (req, res) => {
 exports.delelteAllCart = async (req, res) => {
     try {
         await delelteAllCart.validateAsync(req.body)
-        const userList = await sellerService.delelteAllCart(req.body);
-        return res.status(userList.statusCode).send(userList)
+        const cart = await sellerService.delelteAllCart(req.body);
+        return res.status(cart.statusCode).send(cart)
     } catch (error) {
         console.log("Error in delelteAllCart API: ", error);
         return res.status(500).send({ statusCode: 500, status: CONSTANT_MSG.STATUS.ERROR, message: error.message });
@@ -83,8 +84,8 @@ exports.delelteAllCart = async (req, res) => {
 exports.getAllCarts = async (req, res) => {
     try {
         await getAllCarts.validateAsync(req.body)
-        const userList = await sellerService.getAllCarts(req.body);
-        return res.status(userList.statusCode).send(userList)
+        const cart = await sellerService.getAllCarts(req.body);
+        return res.status(cart.statusCode).send(cart)
     } catch (error) {
         console.log("Error in getAllCarts API: ", error);
         return res.status(500).send({ statusCode: 500, status: CONSTANT_MSG.STATUS.ERROR, message: error.message });
@@ -94,10 +95,21 @@ exports.getAllCarts = async (req, res) => {
 exports.orderPlaced = async (req, res) => {
     try {
         await orderPlaced.validateAsync(req.body)
-        const userList = await sellerService.orderPlaced(req.body);
-        return res.status(userList.statusCode).send(userList)
+        const order = await sellerService.orderPlaced(req.body);
+        return res.status(order.statusCode).send(order)
     } catch (error) {
         console.log("Error in orderPlaced API: ", error);
+        return res.status(500).send({ statusCode: 500, status: CONSTANT_MSG.STATUS.ERROR, message: error.message });
+    }
+};
+
+exports.deleteOrder = async (req, res) => {
+    try {
+        await deleteOrder.validateAsync(req.body)
+        const order = await sellerService.deleteOrder(req.body);
+        return res.status(order.statusCode).send(order)
+    } catch (error) {
+        console.log("Error in deleteOrder API: ", error);
         return res.status(500).send({ statusCode: 500, status: CONSTANT_MSG.STATUS.ERROR, message: error.message });
     }
 };
