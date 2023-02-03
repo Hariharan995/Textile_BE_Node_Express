@@ -30,13 +30,18 @@ const productSchema = mongoose.Schema(
             type: Number
         },
         taxPercent: {
-            type: Number
+            type: Number,
+            default: 0
         },
         barcodeId: {
             type: String,
         },
         gender: {
             type: String,
+        },
+        salesCount: {
+            type: Number,
+            default: 0
         },
     },
     {

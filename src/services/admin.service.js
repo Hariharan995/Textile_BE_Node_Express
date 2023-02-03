@@ -1,8 +1,11 @@
 const { CONSTANT_MSG } = require('../config/constant_messages');
-const { User, Product, Sale } = require('../models');
+const { User, Product, Sale, CreditPoint, Buyer } = require('../models');
 const moment = require("moment");
 const e = require('cors');
 const ObjectID = require('mongodb').ObjectId;
+const path = require('path');
+const fs = require('fs');
+const { send } = require('process');
 
 exports.getAllUsers = async (req) => {
     try {
@@ -13,7 +16,7 @@ exports.getAllUsers = async (req) => {
         let filterObj = req.body.filterObj
         let filter_obj = {};
         let adminPipeline = [];
-
+        adminPipeline.push({ $sort: { createdAt: -1 } })
         if (filterObj && (filterObj.startDate && filterObj.endDate)) {
             if (filterObj.endDate) {
                 endDate = new Date(filterObj.endDate);
@@ -86,6 +89,78 @@ exports.getAllUsers = async (req) => {
     }
 };
 
+exports.getAllBuyers = async (req) => {
+    try {
+        const page = req.body.page;
+        const limit = req.body.limit;
+        const skip = (page - 1) * limit;
+        let sort_obj = req.body.sortObj;
+        let filterObj = req.body.filterObj
+        let filter_obj = {};
+        let adminPipeline = [];
+        adminPipeline.push({ $sort: { buyAmount: -1, creditPoints: -1 } })
+        if (filterObj && (filterObj.startDate && filterObj.endDate)) {
+            if (filterObj.endDate) {
+                endDate = new Date(filterObj.endDate);
+                endDate.setDate(endDate.getDate() + 1);
+                endDate = moment(endDate, "YYYY-MM-DD").toISOString()
+                endDate = endDate.slice(0, endDate.length - 1)
+            }
+            if (filterObj.startDate) {
+                filterObj.startDate = moment(filterObj.startDate, "YYYY-MM-DD").toISOString()
+                filterObj.startDate = filterObj.startDate.slice(0, filterObj.startDate.length - 1)
+            }
+            filter_obj.createdAt = { '$gte': new Date(filterObj.startDate), '$lte': new Date(endDate) }
+        }
+
+        if (req.body.filterObj && req.body.filterObj?.searchValue) {
+            filter_obj = {
+                $or: [
+                    { mobile: { $regex: req.body.filterObj.searchValue, $options: 'i' } },
+                    { name: { $regex: req.body.filterObj.searchValue, $options: 'i' } }
+                ]
+            }
+        }
+
+        if (Object.entries(filter_obj).length != 0) {
+            const filter_app =
+            {
+                $match: filter_obj
+            };
+            adminPipeline.push(filter_app);
+        }
+        adminPipeline.push({
+            $project: {
+                "__v": 0,
+            }
+        })
+        if (sort_obj) {
+            const sort_app =
+            {
+                $sort: sort_obj
+            };
+            adminPipeline.push(sort_app)
+        }
+        const totalRecordsCount = await Buyer.aggregate(adminPipeline)
+        adminPipeline.push({ $skip: skip });
+        adminPipeline.push({ $limit: limit });
+        const userList = await Buyer.aggregate(adminPipeline)
+        return {
+            statusCode: 200,
+            status: CONSTANT_MSG.STATUS.SUCCESS,
+            message: CONSTANT_MSG.USER.USER_LIST,
+            data: userList || [],
+            count: totalRecordsCount.length || 0
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+            status: CONSTANT_MSG.STATUS.ERROR,
+            message: error.message,
+        };
+    }
+};
+
 exports.getAllProducts = async (req) => {
     try {
         const page = req.body.page;
@@ -95,7 +170,7 @@ exports.getAllProducts = async (req) => {
         let filter_obj = {};
         let adminPipeline = [];
         let filterObj = req.body.filterObj
-
+        adminPipeline.push({ $sort: { createdAt: -1 } })
         if (filterObj && (filterObj.startDate && filterObj.endDate)) {
             if (filterObj.endDate) {
                 endDate = new Date(filterObj.endDate);
@@ -146,6 +221,9 @@ exports.getAllProducts = async (req) => {
         adminPipeline.push({ $skip: skip });
         adminPipeline.push({ $limit: limit });
         const productList = await Product.aggregate(adminPipeline)
+        for (const [index, product] of productList.entries()) {
+            productList[index].productImageData = await this.getFile(product.productImage)
+        }
         return {
             statusCode: 200,
             status: CONSTANT_MSG.STATUS.SUCCESS,
@@ -169,19 +247,30 @@ exports.getAllSales = async (req) => {
         const skip = (page - 1) * limit;
         let sort_obj = req.body.sortObj;
         let filter_obj = {};
-        let adminPipeline = [{
-            $addFields: {
-                sellerObjId: { $toObjectId: "$sellerId" },
-            }
-        },
-        {
-            $lookup: {
-                from: 'User', localField: 'sellerObjId', foreignField: '_id',
-                pipeline: [{ $project: { _id: 1, name: 1, mobile: 1 } }],
-                as: 'sellerDetails'
+        let adminPipeline = [
+            { $sort: { createdAt: -1 } },
+            {
+                $addFields: {
+                    sellerObjId: { $toObjectId: "$sellerId" },
+                    buyerObjId: { $toObjectId: "$buyerId" },
+                }
             },
-        },
-        { $unwind: { path: "$sellerDetails", preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: 'User', localField: 'sellerObjId', foreignField: '_id',
+                    pipeline: [{ $project: { _id: 1, name: 1, mobile: 1 } }],
+                    as: 'sellerDetails'
+                },
+            },
+            { $unwind: { path: "$sellerDetails", preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: 'Buyer', localField: 'buyerObjId', foreignField: '_id',
+                    pipeline: [{ $project: { _id: 1, name: 1, mobile: 1 } }],
+                    as: 'buyerDetails'
+                },
+            },
+            { $unwind: { path: "$buyerDetails", preserveNullAndEmptyArrays: true } },
         ];
 
         if (req.body.filterObj && req.body.filterObj?.searchValue) {
@@ -259,3 +348,52 @@ exports.userApproval = async (reqBody) => {
         };
     }
 };
+
+exports.getCreditPoints = async () => {
+    try {
+        const points = await CreditPoint.find({})
+        return {
+            statusCode: 200,
+            status: CONSTANT_MSG.STATUS.SUCCESS,
+            message: CONSTANT_MSG.CREDITPOINTS.CREDITPOINTS_DETAILS,
+            data: points
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+            status: CONSTANT_MSG.STATUS.ERROR,
+            message: error.message,
+        };
+    }
+};
+
+exports.updateCreditPoints = async (reqBody) => {
+    try {
+        await CreditPoint.updateOne({ _id: ObjectID(reqBody.creditPointId) }, reqBody)
+        return {
+            statusCode: 200,
+            status: CONSTANT_MSG.STATUS.SUCCESS,
+            message: CONSTANT_MSG.CREDITPOINTS.CREDITPOINTS_UPDATED
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+            status: CONSTANT_MSG.STATUS.ERROR,
+            message: error.message,
+        };
+    }
+};
+
+exports.getFile = async (productImage, res) => {
+    const credPaths = path.join(__dirname, '../productImages/' + productImage);
+    //var imageAsBase64 = fs.createReadStream(credPaths);
+    var stream = fs.createReadStream(credPaths)
+    stream.pipe();
+    
+    var reader = new FileReader(imageAsBase64);
+    this.imagePath = files;
+    reader.readAsDataURL(files[0]); 
+    reader.onload = (_event) => { 
+      this.imgURL = reader.result; 
+    }
+}

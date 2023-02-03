@@ -69,6 +69,11 @@ module.exports.userApproval = joi.object({
     userId: joiObjectId().required(),
     userStatus: joi.string().valid('APPROVED', 'REJECTED').required()
 })
+module.exports.updateCreditPoints = joi.object({
+    point: joi.number().min(1).required(),
+    amount: joi.number().min(1).required(),
+    creditPointId: joiObjectId().required(),
+})
 
 module.exports.addProduct = joi.object({
     sellerId: joiObjectId().required(),
@@ -125,10 +130,19 @@ module.exports.getAllCarts = joi.object({
     userId: joiObjectId().required()
 });
 
-module.exports.orderPlaced = joi.object({
-    sellerId: joiObjectId().required(),
+module.exports.getBuyerDetails = joi.object({
+    buyerMobile: joi.string().required(),
+    buyerName: joi.string().required()
 });
 
-module.exports.deleteOrder = joi.object({
+module.exports.orderPlaced = joi.object({
+    sellerId: joiObjectId().required(),
+    paymentType: joi.string().required().valid("ONLINEPAYMENT", "COD"),
+    buyerId: joi.string(),
+    discountAmount: joi.string(),
+    isCreditApply: joi.boolean(),
+});
+
+module.exports.deleteSale = joi.object({
     orderId: joiObjectId().required(),
 });

@@ -1,6 +1,6 @@
 const { sellerService } = require('../services');
-const { addProduct, updateProduct, deleteProduct, getProductById, addToCart, deleteSingleCart, delelteAllCart,
-     getAllCarts, orderPlaced , deleteOrder} = require('../validator/validation')
+const { addProduct, updateProduct, deleteProduct, getProductById, addToCart, deleteSingleCart, delelteAllCart, getAllCarts, orderPlaced,deleteSale,
+     getBuyerDetails } = require('../validator/validation')
 const { CONSTANT_MSG } = require('../config/constant_messages');
 
 
@@ -103,13 +103,34 @@ exports.orderPlaced = async (req, res) => {
     }
 };
 
-exports.deleteOrder = async (req, res) => {
+exports.deleteSale = async (req, res) => {
     try {
-        await deleteOrder.validateAsync(req.body)
-        const order = await sellerService.deleteOrder(req.body);
-        return res.status(order.statusCode).send(order)
+        await deleteSale.validateAsync(req.body)
+        const userList = await sellerService.deleteSale(req.body);
+        return res.status(userList.statusCode).send(userList)
     } catch (error) {
-        console.log("Error in deleteOrder API: ", error);
+        console.log("Error in deleteSale API: ", error);
+        return res.status(500).send({ statusCode: 500, status: CONSTANT_MSG.STATUS.ERROR, message: error.message });
+    }
+};
+
+exports.getBuyerDetails = async (req, res) => {
+    try {
+        await getBuyerDetails.validateAsync(req.body)
+        const buyer = await sellerService.getBuyerDetails(req.body);
+        return res.status(buyer.statusCode).send(buyer)
+    } catch (error) {
+        console.log("Error in getBuyerDetails API: ", error);
+        return res.status(500).send({ statusCode: 500, status: CONSTANT_MSG.STATUS.ERROR, message: error.message });
+    }
+};
+
+exports.imageUpload = async (req, res) => {
+    try {
+        const buyer = await sellerService.imageUpload(req.body);
+        return res.status(buyer.statusCode).send(buyer)
+    } catch (error) {
+        console.log("Error in imageUpload API: ", error);
         return res.status(500).send({ statusCode: 500, status: CONSTANT_MSG.STATUS.ERROR, message: error.message });
     }
 };

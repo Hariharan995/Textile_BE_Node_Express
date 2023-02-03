@@ -1,5 +1,5 @@
 const { CONSTANT_MSG } = require('../config/constant_messages');
-const { Product, Cart, Sale } = require('../models');
+const { Product, Cart, Sale, Buyer, CreditPoint } = require('../models');
 const ObjectID = require('mongodb').ObjectId;
 
 exports.addProduct = async (reqBody) => {
@@ -107,6 +107,56 @@ exports.getProductById = async (reqBody) => {
             status: CONSTANT_MSG.STATUS.SUCCESS,
             message: CONSTANT_MSG.PRODUCT.PRODUCT_DETAILS,
             data: product
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+            status: CONSTANT_MSG.STATUS.ERROR,
+            message: error.message,
+        };
+    }
+};
+
+exports.getBuyerDetails = async (reqBody) => {
+    try {
+        let buyer = await Buyer.findOne({ mobile: reqBody.buyerMobile }, { creditPoints: 1, mobile: 1, name: 1 })
+        if (!buyer) {
+            let buyers = new Buyer({ name: reqBody.buyerName, mobile: reqBody.buyerMobile })
+            await buyers.save()
+            buyer = await Buyer.findOne({ mobile: reqBody.buyerMobile }, { creditPoints: 1, mobile: 1, name: 1 })
+        } else {
+            await Buyer.updateOne({ _id: ObjectID(buyer._id) }, { name: reqBody.buyerName })
+        }
+        return {
+            statusCode: 200,
+            status: CONSTANT_MSG.STATUS.SUCCESS,
+            message: CONSTANT_MSG.BUYER.BUYER_DETAILS,
+            data: buyer
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+            status: CONSTANT_MSG.STATUS.ERROR,
+            message: error.message,
+        };
+    }
+};
+
+exports.imageUpload = async (reqBody) => {
+    try {
+        let buyer = await Buyer.findOne({ mobile: reqBody.buyerMobile }, { creditPoints: 1, mobile: 1, name: 1 })
+        if (!buyer) {
+            let buyers = new Buyer({ name: reqBody.buyerName, mobile: reqBody.buyerMobile })
+            await buyers.save()
+            buyer = await Buyer.findOne({ mobile: reqBody.buyerMobile }, { creditPoints: 1, mobile: 1, name: 1 })
+        } else {
+            await Buyer.updateOne({ _id: ObjectID(buyer._id) }, { name: reqBody.buyerName })
+        }
+        return {
+            statusCode: 200,
+            status: CONSTANT_MSG.STATUS.SUCCESS,
+            message: CONSTANT_MSG.BUYER.BUYER_DETAILS,
+            data: buyer
         };
     } catch (error) {
         return {
@@ -252,8 +302,10 @@ exports.getAllCarts = async (reqBody) => {
 exports.orderPlaced = async (reqBody) => {
     try {
         const orderNo = await orderNoVerify();
+        let buyerDetail = await buyerDetails(reqBody)
         let productList = [];
         let subTotal = 0, mrpTotal = 0, priceTotal = 0, totalAmount = 0;
+        const creditPoint = await CreditPoint.findOne({})
         const cartList = await Cart.aggregate([
             { $match: { userId: reqBody.sellerId } },
             {
@@ -290,15 +342,32 @@ exports.orderPlaced = async (reqBody) => {
         let order = {
             orderNo: orderNo,
             sellerId: reqBody.sellerId,
+            paymentType: reqBody.paymentType,
             productList: productList,
             itemCount: productList.length,
             mrpTotal: Number(mrpTotal.toFixed(2)),
             priceTotal: Number(priceTotal.toFixed(2)),
             subTotal: Number(subTotal.toFixed(2)),
-            totalAmount: Number(subTotal.toFixed(2))
+            totalAmount: reqBody.discountAmount ? Number(subTotal - reqBody.discountAmount).toFixed(2) : Number(subTotal.toFixed(2))
+        }
+        if (reqBody.discountAmount) {
+            order.discountAmount = reqBody.discountAmount
+        }
+        if (buyerDetail) {
+            order.buyerId = buyerDetail._id
+        }
+        if (reqBody.isCreditApply && buyerDetail) {
+            order.creditAmount = buyerDetail.creditPoint * creditPoint.amount
+            await Buyer.updateOne({ _id: ObjectID(buyerDetail._id) }, { $inc: { creditPoint: 0 } })
         }
         order = new Sale(order)
         await order.save()
+        if (buyerDetail) {
+            const point = order.creditAmount ? Number((order.totalAmount - order.creditAmount) / creditPoint.amount) : Number(order.totalAmount / creditPoint.amount)
+            const totalAmounts = order.creditAmount ? order.totalAmount - order.creditAmount : order.totalAmount
+            await Buyer.updateOne({ _id: buyerDetail._id }, { $inc: { creditPoints: point, buyCount: 1, buyAmount: totalAmounts } })
+        }
+        productUpdate(cartList)
         await Cart.deleteMany({ userId: reqBody.sellerId })
         return {
             statusCode: 200,
@@ -314,16 +383,8 @@ exports.orderPlaced = async (reqBody) => {
     }
 };
 
-exports.deleteOrder = async (reqBody) => {
+exports.deleteSale = async (reqBody) => {
     try {
-        const order = await Sale.findOne({ _id: ObjectID(reqBody.orderId) })
-        if (!order) {
-            return {
-                statusCode: 400,
-                status: CONSTANT_MSG.STATUS.ERROR,
-                message: CONSTANT_MSG.SALES.SALE_NOT_DETAILS
-            };
-        }
         await Sale.deleteOne({ _id: ObjectID(reqBody.orderId) })
         return {
             statusCode: 200,
@@ -354,4 +415,15 @@ const dbCheck = async (verifyNo, verifyType) => {
         return false
     }
     return true
+}
+
+const buyerDetails = async (reqBody) => {
+    let buyerDetail = await Buyer.findOne({ _id: ObjectID(reqBody.buyerId) })
+    return buyerDetail
+}
+
+const productUpdate = async (products) => {
+    for (const product of products) {
+        await Product.updateOne({ _id: ObjectID(product.productDetails._id) }, { $inc: { quantity: -product.quantity, salesCount: product.quantity } })
+    }
 }

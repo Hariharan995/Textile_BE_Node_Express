@@ -91,4 +91,11 @@ module.exports.CONSTANT_MSG = {
         SALE_INACTIVE_SUCCESSFULLY: 'Sales Inactivated successfully',
         SALE_ACTIVATED_SUCCESSFULLY: 'Sales Activated successfully',
     },
+    BUYER: {
+        BUYER_DETAILS: "Buyer details fetch successfully",
+    },
+    CREDITPOINTS: {
+        CREDITPOINTS_DETAILS: "Credit points details fetch successfully",
+        CREDITPOINTS_UPDATED: "Credit points updated successfully",
+    },
 }

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { CreditPoint } = require('.');
 
 const saleSchema = mongoose.Schema(
     {
@@ -25,6 +26,20 @@ const saleSchema = mongoose.Schema(
         },
         totalAmount: {
             type: Number,
+        },
+        buyerId: {
+            type: String,
+        },
+        paymentType: {
+            type: String,
+        },
+        discountAmount: {
+            type: Number,
+            default: 0
+        },
+        CreditAmount: {
+            type: Number,
+            default: 0
         },
     },
     {
