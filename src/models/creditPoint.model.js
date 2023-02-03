@@ -3,10 +3,13 @@ const mongoose = require('mongoose');
 const creditPointSchema = mongoose.Schema(
     {
         point: {
-            type: String,
+            type: Number,
         },
         amount: {
-            type: String,
+            type: Number,
+        },
+        applyPercent: {
+            type: Number,
         }
     },
     {

@@ -35,11 +35,9 @@ const saleSchema = mongoose.Schema(
         },
         discountAmount: {
             type: Number,
-            default: 0
         },
-        CreditAmount: {
+        creditAmount: {
             type: Number,
-            default: 0
         },
     },
     {

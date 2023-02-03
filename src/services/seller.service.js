@@ -127,11 +127,15 @@ exports.getBuyerDetails = async (reqBody) => {
         } else {
             await Buyer.updateOne({ _id: ObjectID(buyer._id) }, { name: reqBody.buyerName })
         }
+        const creditDetails = await CreditPoint.findOne({})
         return {
             statusCode: 200,
             status: CONSTANT_MSG.STATUS.SUCCESS,
             message: CONSTANT_MSG.BUYER.BUYER_DETAILS,
-            data: buyer
+            data: {
+                buyer: buyer,
+                creditPointList: creditDetails
+            }
         };
     } catch (error) {
         return {
@@ -347,7 +351,7 @@ exports.orderPlaced = async (reqBody) => {
             itemCount: productList.length,
             mrpTotal: Number(mrpTotal.toFixed(2)),
             priceTotal: Number(priceTotal.toFixed(2)),
-            subTotal: Number(subTotal.toFixed(2)),
+            subTotal: reqBody.discountAmount ? Number(subTotal - reqBody.discountAmount).toFixed(2) : Number(subTotal.toFixed(2)),
             totalAmount: reqBody.discountAmount ? Number(subTotal - reqBody.discountAmount).toFixed(2) : Number(subTotal.toFixed(2))
         }
         if (reqBody.discountAmount) {
@@ -357,14 +361,19 @@ exports.orderPlaced = async (reqBody) => {
             order.buyerId = buyerDetail._id
         }
         if (reqBody.isCreditApply && buyerDetail) {
-            order.creditAmount = buyerDetail.creditPoint * creditPoint.amount
-            await Buyer.updateOne({ _id: ObjectID(buyerDetail._id) }, { $inc: { creditPoint: 0 } })
+            let creditAmount = buyerDetail.creditPoints * creditPoint.amount
+            creditAmount = order.totalAmount > (creditAmount / (100 / creditPoint.applyPercent)) ? creditAmount / (100 / creditPoint.applyPercent) : order.totalAmount / (100 / creditPoint.applyPercent)
+            let creditPoints = creditAmount / creditPoint.amount
+            order.creditAmount = Number(creditAmount).toFixed(2)
+            order.subTotal = Number(order.subTotal - creditAmount).toFixed(2)
+            order.totalAmount = Number(order.totalAmount - creditAmount).toFixed(2)
+            await Buyer.updateOne({ _id: ObjectID(buyerDetail._id) }, { $inc: { creditPoint: -creditPoints } })
         }
         order = new Sale(order)
         await order.save()
         if (buyerDetail) {
-            const point = order.creditAmount ? Number((order.totalAmount - order.creditAmount) / creditPoint.amount) : Number(order.totalAmount / creditPoint.amount)
-            const totalAmounts = order.creditAmount ? order.totalAmount - order.creditAmount : order.totalAmount
+            const point = order.creditAmount / creditPoint.amount
+            const totalAmounts = order.totalAmount
             await Buyer.updateOne({ _id: buyerDetail._id }, { $inc: { creditPoints: point, buyCount: 1, buyAmount: totalAmounts } })
         }
         productUpdate(cartList)

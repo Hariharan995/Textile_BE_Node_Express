@@ -72,6 +72,7 @@ module.exports.userApproval = joi.object({
 module.exports.updateCreditPoints = joi.object({
     point: joi.number().min(1).required(),
     amount: joi.number().min(1).required(),
+    applyPercent: joi.number().min(1).required(),
     creditPointId: joiObjectId().required(),
 })
 
