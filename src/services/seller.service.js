@@ -361,19 +361,20 @@ exports.orderPlaced = async (reqBody) => {
             order.buyerId = buyerDetail._id
         }
         if (reqBody.isCreditApply && buyerDetail) {
-            let creditAmount = buyerDetail.creditPoints * creditPoint.amount
-            creditAmount = order.totalAmount > (creditAmount / (100 / creditPoint.applyPercent)) ? creditAmount / (100 / creditPoint.applyPercent) : order.totalAmount / (100 / creditPoint.applyPercent)
-            let creditPoints = creditAmount / creditPoint.amount
+
+            let applicableCreditAmount = order.totalAmount / (100 / creditPoint.applyPercent)
+            let  creditAmount = buyerDetail.creditPoints > applicableCreditAmount ? applicableCreditAmount : buyerDetail.creditPoints
+            let creditPoints = Number(creditAmount).toFixed(2)
             order.creditAmount = Number(creditAmount).toFixed(2)
             order.subTotal = Number(order.subTotal - creditAmount).toFixed(2)
             order.totalAmount = Number(order.totalAmount - creditAmount).toFixed(2)
-            await Buyer.updateOne({ _id: ObjectID(buyerDetail._id) }, { $inc: { creditPoint: -creditPoints } })
+            await Buyer.updateOne({ _id: ObjectID(buyerDetail._id) }, { $inc: { creditPoint: (-(creditPoints)) } })
         }
         order = new Sale(order)
         await order.save()
         if (buyerDetail) {
-            const point = order.creditAmount / creditPoint.amount
-            const totalAmounts = order.totalAmount
+            const point = Number((order.totalAmount / creditPoint.amount).toFixed(2))
+            const totalAmounts = Number(order.totalAmount.toFixed(2))
             await Buyer.updateOne({ _id: buyerDetail._id }, { $inc: { creditPoints: point, buyCount: 1, buyAmount: totalAmounts } })
         }
         productUpdate(cartList)
@@ -433,6 +434,6 @@ const buyerDetails = async (reqBody) => {
 
 const productUpdate = async (products) => {
     for (const product of products) {
-        await Product.updateOne({ _id: ObjectID(product.productDetails._id) }, { $inc: { quantity: -product.quantity, salesCount: product.quantity } })
+        await Product.updateOne({ _id: ObjectID(product.productDetails._id) }, { $inc: { quantity: (-(product.quantity)), salesCount: product.quantity } })
     }
 }

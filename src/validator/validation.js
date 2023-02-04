@@ -56,6 +56,7 @@ module.exports.getAllSales = joi.object({
     limit: joi.number().min(1).required(),
     filterObj: joi.object({
         searchValue: joi.string().allow(''),
+        paymentType: joi.string().valid("ONLINEPAYMENT", "COD").allow(''),
         startDate: joi.string().allow(''),
         endDate: joi.string().allow(''),
     }),

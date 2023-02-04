@@ -13,7 +13,29 @@ module.exports.addDataToGoogleSheets = async (sheetId, SheetName) => {
             { $sort: { updatedAt: -1 } },
         ]) : await Sale.aggregate([
             { $match: { createdAt: { $gte: new Date(date) } } },
-            { $sort: { updatedAt: -1 } },
+            { $sort: { createdAt: -1 } },
+            {
+                $addFields: {
+                    sellerObjId: { $toObjectId: "$sellerId" },
+                    buyerObjId: { $toObjectId: "$buyerId" },
+                }
+            },
+            {
+                $lookup: {
+                    from: 'User', localField: 'sellerObjId', foreignField: '_id',
+                    pipeline: [{ $project: { _id: 1, name: 1, mobile: 1 } }],
+                    as: 'sellerDetails'
+                },
+            },
+            { $unwind: { path: "$sellerDetails", preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: 'Buyer', localField: 'buyerObjId', foreignField: '_id',
+                    pipeline: [{ $project: { _id: 1, name: 1, mobile: 1 } }],
+                    as: 'buyerDetails'
+                },
+            },
+            { $unwind: { path: "$buyerDetails", preserveNullAndEmptyArrays: true } },
         ])
         let titleKeys = SheetName === "Products" ? ["Id", "BarcodeId", "ProductName", "Description", "Brand",
             "MRP", "Price", "Stock", "TaxPercent", "SalesCount"] :
@@ -42,10 +64,14 @@ module.exports.addDataToGoogleSheets = async (sheetId, SheetName) => {
                 rows.push(JSON.stringify({
                     "Id": element._id,
                     "OrderNo": element.orderNo,
-                    "ItemCount": element.itemCount,
+                    "Seller Name": element?.sellerDetails?.name,
+                    "Buyer Name": element?.buyerDetails?.name,
+                    "Payment Type": element.paymentType,
+                    "Credit Point Amount": element.creditAmount,
+                    "Discount Amount": element.discountAmount,
                     "MRPTotal": element.MRPTotal,
                     "SubTotal": element.subTotal,
-                    "TotalAmount": element.totalAmount,
+                    "TotalAmount": element.totalAmount,                   
                 }))
             }
         }

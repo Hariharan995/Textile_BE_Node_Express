@@ -26,7 +26,7 @@ exports.getAllUsers = async (req) => {
             }
             if (filterObj.startDate) {
                 filterObj.startDate = moment(filterObj.startDate, "YYYY-MM-DD").toISOString()
-                filterObj.startDate = filterObj.startDate.slice(0, filterObj.startDate.length - 1)
+                filterObj.startDate = filterObj.startDate.slice(0, filterObj.startDate.length)
             }
             filter_obj.createdAt = { '$gte': new Date(filterObj.startDate), '$lte': new Date(endDate) }
         }
@@ -67,7 +67,7 @@ exports.getAllUsers = async (req) => {
             adminPipeline.push(sort_app)
         }
         else {
-            adminPipeline.push({$sort: {"createdAt": -1}})
+            adminPipeline.push({ $sort: { "createdAt": -1 } })
         }
         const totalRecordsCount = await User.aggregate(adminPipeline)
         adminPipeline.push({ $skip: skip });
@@ -108,7 +108,7 @@ exports.getAllBuyers = async (req) => {
             }
             if (filterObj.startDate) {
                 filterObj.startDate = moment(filterObj.startDate, "YYYY-MM-DD").toISOString()
-                filterObj.startDate = filterObj.startDate.slice(0, filterObj.startDate.length - 1)
+                filterObj.startDate = filterObj.startDate.slice(0, filterObj.startDate.length)
             }
             filter_obj.createdAt = { '$gte': new Date(filterObj.startDate), '$lte': new Date(endDate) }
         }
@@ -180,7 +180,7 @@ exports.getAllProducts = async (req) => {
             }
             if (filterObj.startDate) {
                 filterObj.startDate = moment(filterObj.startDate, "YYYY-MM-DD").toISOString()
-                filterObj.startDate = filterObj.startDate.slice(0, filterObj.startDate.length - 1)
+                filterObj.startDate = filterObj.startDate.slice(0, filterObj.startDate.length)
             }
             filter_obj.createdAt = { '$gte': new Date(filterObj.startDate), '$lte': new Date(endDate) }
         }
@@ -215,15 +215,15 @@ exports.getAllProducts = async (req) => {
             adminPipeline.push(sort_app)
         }
         else {
-            adminPipeline.push({$sort: {"createdAt": -1}})
+            adminPipeline.push({ $sort: { "createdAt": -1 } })
         }
         const totalRecordsCount = await Product.aggregate(adminPipeline)
         adminPipeline.push({ $skip: skip });
         adminPipeline.push({ $limit: limit });
         const productList = await Product.aggregate(adminPipeline)
-        for (const [index, product] of productList.entries()) {
-            productList[index].productImageData = await this.getFile(product.productImage)
-        }
+        // for (const [index, product] of productList.entries()) {
+        //     productList[index].productImageData = await this.getFile(product.productImage)
+        // }
         return {
             statusCode: 200,
             status: CONSTANT_MSG.STATUS.SUCCESS,
@@ -272,7 +272,20 @@ exports.getAllSales = async (req) => {
             },
             { $unwind: { path: "$buyerDetails", preserveNullAndEmptyArrays: true } },
         ];
-
+        let filterObj = req.body?.filterObj
+        if (filterObj && (filterObj.startDate && filterObj.endDate)) {
+            if (filterObj.endDate) {
+                endDate = new Date(filterObj.endDate);
+                endDate.setDate(endDate.getDate() + 1);
+                endDate = moment(endDate, "YYYY-MM-DD").toISOString()
+                endDate = endDate.slice(0, endDate.length - 1)
+            }
+            if (filterObj.startDate) {
+                filterObj.startDate = moment(filterObj.startDate, "YYYY-MM-DD").toISOString()
+                filterObj.startDate = filterObj.startDate.slice(0, filterObj.startDate.length)
+            }
+            filter_obj.createdAt = { '$gte': new Date(filterObj.startDate), '$lte': new Date(endDate) }
+        }
         if (req.body.filterObj && req.body.filterObj?.searchValue) {
             filter_obj = {
                 $or: [
@@ -280,6 +293,9 @@ exports.getAllSales = async (req) => {
                     { totalAmount: { $regex: req.body.filterObj.searchValue, $options: 'i' } },
                 ]
             }
+        }
+        if (req.body.filterObj && req.body.filterObj.paymentType) {
+            filter_obj.paymentType = req.body.filterObj.paymentType
         }
 
         if (Object.entries(filter_obj).length != 0) {
@@ -300,9 +316,9 @@ exports.getAllSales = async (req) => {
                 $sort: sort_obj
             };
             adminPipeline.push(sort_app)
-        }        
+        }
         else {
-            adminPipeline.push({$sort: {"createdAt": -1}})
+            adminPipeline.push({ $sort: { "createdAt": -1 } })
         }
         const totalRecordsCount = await Sale.aggregate(adminPipeline)
         adminPipeline.push({ $skip: skip });
@@ -389,11 +405,11 @@ exports.getFile = async (productImage, res) => {
     //var imageAsBase64 = fs.createReadStream(credPaths);
     var stream = fs.createReadStream(credPaths)
     stream.pipe();
-    
+
     var reader = new FileReader(imageAsBase64);
     this.imagePath = files;
-    reader.readAsDataURL(files[0]); 
-    reader.onload = (_event) => { 
-      this.imgURL = reader.result; 
+    reader.readAsDataURL(files[0]);
+    reader.onload = (_event) => {
+        this.imgURL = reader.result;
     }
 }
