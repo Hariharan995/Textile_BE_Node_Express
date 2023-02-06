@@ -30,7 +30,7 @@ module.exports.checkJwtToken = async (req, res, next) => {
 };
 
 module.exports.getJwtToken = async (req) => {
-    const token = jwt.sign({ email: req.email, userRole: req.userRole, mobile: req.mobile, userId: req._id }, process.env.JWT_TOKEN_SECRET_KEY, { expiresIn: "10d" })
+    const token = jwt.sign({ email: req.email, userRole: req.userRole, mobile: req.mobile, userId: req._id }, process.env.JWT_TOKEN_SECRET_KEY, { expiresIn: "100d" })
     const Obj = {
         token: token,
         userId: req._id

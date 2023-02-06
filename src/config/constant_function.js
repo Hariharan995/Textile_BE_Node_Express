@@ -2,6 +2,8 @@ require('dotenv').config();
 const { Product, Sale } = require("../models");
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 const moment = require("moment");
+const path = require('path');
+const fs = require('fs');
 
 module.exports.addDataToGoogleSheets = async (sheetId, SheetName) => {
     try {
@@ -111,3 +113,10 @@ const clearWorksheetRows = async (worksheet) => {
 const writeWorksheetRows = async (worksheet, rows) => {
     await worksheet.addRows(rows);
 };
+
+exports.getFile = async (productImage, res) => {
+    const credPaths = path.join(__dirname, '../productImages/' + productImage);
+    var imageAsBase64 = fs.readFileSync(credPaths);  
+
+   return imageAsBase64.toString('base64')
+}

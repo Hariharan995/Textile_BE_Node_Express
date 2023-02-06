@@ -1,11 +1,8 @@
 const { CONSTANT_MSG } = require('../config/constant_messages');
 const { User, Product, Sale, CreditPoint, Buyer } = require('../models');
 const moment = require("moment");
-const e = require('cors');
 const ObjectID = require('mongodb').ObjectId;
-const path = require('path');
-const fs = require('fs');
-const { send } = require('process');
+const { getFile } = require('../config/constant_function');
 
 exports.getAllUsers = async (req) => {
     try {
@@ -221,9 +218,9 @@ exports.getAllProducts = async (req) => {
         adminPipeline.push({ $skip: skip });
         adminPipeline.push({ $limit: limit });
         const productList = await Product.aggregate(adminPipeline)
-        // for (const [index, product] of productList.entries()) {
-        //     productList[index].productImageData = await this.getFile(product.productImage)
-        // }
+        for (const [index, product] of productList.entries()) {
+            productList[index].productImageData = await getFile(product.productImage)
+        }
         return {
             statusCode: 200,
             status: CONSTANT_MSG.STATUS.SUCCESS,
@@ -400,16 +397,49 @@ exports.updateCreditPoints = async (reqBody) => {
     }
 };
 
-exports.getFile = async (productImage, res) => {
-    const credPaths = path.join(__dirname, '../productImages/' + productImage);
-    //var imageAsBase64 = fs.createReadStream(credPaths);
-    var stream = fs.createReadStream(credPaths)
-    stream.pipe();
-
-    var reader = new FileReader(imageAsBase64);
-    this.imagePath = files;
-    reader.readAsDataURL(files[0]);
-    reader.onload = (_event) => {
-        this.imgURL = reader.result;
+exports.getSaleById = async (reqBody) => {
+    try {
+        let sale = await Sale.aggregate([
+            { $match: { _id: ObjectID(reqBody.saleId) } },
+            {
+                $addFields: {
+                    sellerObjId: { $toObjectId: "$sellerId" },
+                    buyerObjId: { $toObjectId: "$buyerId" },
+                }
+            },
+            {
+                $lookup: {
+                    from: 'User', localField: 'sellerObjId', foreignField: '_id',
+                    pipeline: [{ $project: { _id: 1, name: 1, mobile: 1 } }],
+                    as: 'sellerDetails'
+                },
+            },
+            { $unwind: { path: "$sellerDetails", preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: 'Buyer', localField: 'buyerObjId', foreignField: '_id',
+                    pipeline: [{ $project: { _id: 1, name: 1, mobile: 1 } }],
+                    as: 'buyerDetails'
+                },
+            },
+            { $unwind: { path: "$buyerDetails", preserveNullAndEmptyArrays: true } },
+        ])
+        sale = sale[0]
+        for (const [index, element] of sale.productList.entries()) {
+            sale.productList[index].productImageData = await getFile(element.productImage)
+        }
+        return {
+            statusCode: 200,
+            status: CONSTANT_MSG.STATUS.SUCCESS,
+            message: CONSTANT_MSG.SALES.SALE_DETAILS,
+            data: sale
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+            status: CONSTANT_MSG.STATUS.ERROR,
+            message: error.message,
+        };
     }
-}
+};
+

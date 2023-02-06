@@ -1,3 +1,4 @@
+const { getFile } = require('../config/constant_function');
 const { CONSTANT_MSG } = require('../config/constant_messages');
 const { Product, Cart, Sale, Buyer, CreditPoint } = require('../models');
 const ObjectID = require('mongodb').ObjectId;
@@ -256,7 +257,7 @@ exports.delelteAllCart = async (reqBody) => {
 
 exports.getAllCarts = async (reqBody) => {
     try {
-        const cart = await Cart.aggregate([
+        let cart = await Cart.aggregate([
             { $match: { userId: reqBody.userId } },
             {
                 $lookup: {
@@ -271,7 +272,8 @@ exports.getAllCarts = async (reqBody) => {
         let priceTotal = 0
         let subTotal = 0
         let totalTax = 0
-        for (const element of cart) {
+        for (const [index, element] of cart.entries()) {
+            cart[index].productDetails.productImageData = await getFile(element.productDetails.productImage)
             mrpTotal += element.productDetails.mrp * element.quantity
             priceTotal += element.productDetails.price * element.quantity
             subTotal += element.productDetails.price * element.quantity
@@ -363,7 +365,7 @@ exports.orderPlaced = async (reqBody) => {
         if (reqBody.isCreditApply && buyerDetail) {
 
             let applicableCreditAmount = order.totalAmount / (100 / creditPoint.applyPercent)
-            let  creditAmount = buyerDetail.creditPoints > applicableCreditAmount ? applicableCreditAmount : buyerDetail.creditPoints
+            let creditAmount = buyerDetail.creditPoints > applicableCreditAmount ? applicableCreditAmount : buyerDetail.creditPoints
             let creditPoints = Number(creditAmount).toFixed(2)
             order.creditAmount = Number(creditAmount).toFixed(2)
             order.subTotal = Number(order.subTotal - creditAmount).toFixed(2)

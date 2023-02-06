@@ -77,6 +77,10 @@ module.exports.updateCreditPoints = joi.object({
     creditPointId: joiObjectId().required(),
 })
 
+module.exports.getSaleById = joi.object({
+    saleId: joiObjectId().required(),
+})
+
 module.exports.addProduct = joi.object({
     sellerId: joiObjectId().required(),
     productName: joi.string().required(),

@@ -1,5 +1,5 @@
 const { adminService } = require('../services');
-const { getAllUsers, getAllProducts, getAllSales, userApproval, updateCreditPoints } = require('../validator/validation')
+const { getAllUsers, getAllProducts, getAllSales, userApproval, updateCreditPoints, getSaleById } = require('../validator/validation')
 const Authentication = require("../middleware/authentication");
 const { CONSTANT_MSG } = require('../config/constant_messages');
 
@@ -76,6 +76,17 @@ exports.updateCreditPoints = async (req, res) => {
         return res.status(points.statusCode).send(points)
     } catch (error) {
         console.log("Error in updateCreditPoints API: ", error);
+        return res.status(500).send({ statusCode: 500, status: CONSTANT_MSG.STATUS.ERROR, message: error.message });
+    }
+};
+
+exports.getSaleById = async (req, res) => {
+    try {
+        await getSaleById.validateAsync(req.body)
+        const sale = await adminService.getSaleById(req.body);
+        return res.status(sale.statusCode).send(sale)
+    } catch (error) {
+        console.log("Error in getSaleById API: ", error);
         return res.status(500).send({ statusCode: 500, status: CONSTANT_MSG.STATUS.ERROR, message: error.message });
     }
 };
