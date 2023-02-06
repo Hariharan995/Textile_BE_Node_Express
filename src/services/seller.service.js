@@ -384,7 +384,8 @@ exports.orderPlaced = async (reqBody) => {
         return {
             statusCode: 200,
             status: CONSTANT_MSG.STATUS.SUCCESS,
-            message: CONSTANT_MSG.SALES.ORDER_PLACED
+            message: CONSTANT_MSG.SALES.ORDER_PLACED,
+            data: order
         };
     } catch (error) {
         return {
