@@ -39,6 +39,9 @@ const saleSchema = mongoose.Schema(
         creditAmount: {
             type: Number,
         },
+        totalTaxAmount: {
+            type: Number,
+        },
     },
     {
         timestamps: true,

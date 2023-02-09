@@ -93,6 +93,8 @@ module.exports.addProduct = joi.object({
     description: joi.string(),
     brand: joi.string(),
     taxPercent: joi.number(),
+    productId: joiObjectId().allow(''),
+
 });
 
 module.exports.updateProduct = joi.object({

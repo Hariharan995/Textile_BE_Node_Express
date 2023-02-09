@@ -310,7 +310,7 @@ exports.orderPlaced = async (reqBody) => {
         const orderNo = await orderNoVerify();
         let buyerDetail = await buyerDetails(reqBody)
         let productList = [];
-        let subTotal = 0, mrpTotal = 0, priceTotal = 0, totalAmount = 0;
+        let subTotal = 0, mrpTotal = 0, priceTotal = 0, totalTaxAmount = 0;
         const creditPoint = await CreditPoint.findOne({})
         const cartList = await Cart.aggregate([
             { $match: { userId: reqBody.sellerId } },
@@ -344,6 +344,11 @@ exports.orderPlaced = async (reqBody) => {
             mrpTotal += element.productDetails.mrp * element.quantity
             priceTotal += element.productDetails.price * element.quantity
             subTotal += element.productDetails.price * element.quantity
+            if (element.productDetails.taxPercent) {
+                product.taxPercent = element.productDetails.taxPercent
+                product.taxAmount = Number((element.productDetails.price / element.productDetails.taxPercent).toFixed(2))
+                totalTaxAmount += Number((product.taxAmount * element.quantity).toFixed(2))
+            }
         }
         let order = {
             orderNo: orderNo,
@@ -353,6 +358,7 @@ exports.orderPlaced = async (reqBody) => {
             itemCount: productList.length,
             mrpTotal: Number(mrpTotal.toFixed(2)),
             priceTotal: Number(priceTotal.toFixed(2)),
+            totalTaxAmount: totalTaxAmount ? Number(totalTaxAmount.toFixed(2)) : 0,
             subTotal: reqBody.discountAmount ? Number(subTotal - reqBody.discountAmount).toFixed(2) : Number(subTotal.toFixed(2)),
             totalAmount: reqBody.discountAmount ? Number(subTotal - reqBody.discountAmount).toFixed(2) : Number(subTotal.toFixed(2))
         }
@@ -363,7 +369,6 @@ exports.orderPlaced = async (reqBody) => {
             order.buyerId = buyerDetail._id
         }
         if (reqBody.isCreditApply && buyerDetail) {
-
             let applicableCreditAmount = order.totalAmount / (100 / creditPoint.applyPercent)
             let creditAmount = buyerDetail.creditPoints > applicableCreditAmount ? applicableCreditAmount : buyerDetail.creditPoints
             let creditPoints = Number(creditAmount).toFixed(2)
