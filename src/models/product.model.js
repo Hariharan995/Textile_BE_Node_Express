@@ -36,9 +36,6 @@ const productSchema = mongoose.Schema(
         barcodeId: {
             type: String,
         },
-        gender: {
-            type: String,
-        },
         salesCount: {
             type: Number,
             default: 0
