@@ -9,12 +9,13 @@ module.exports.addDataToGoogleSheets = async (sheetId, SheetName) => {
     try {
         let rows = []
         let date = new Date().toLocaleDateString()
-        // date = moment(date, "YYYY-MM-DD").toISOString()
-        // date = date.slice(0, date.length - 1)
+        let nextDate = new Date()
+        nextDate = nextDate.setDate(nextDate.getDate - 1)
+        nextDate = new Date(nextDate).toLocaleDateString()
         let list = SheetName === "Products" ? await Product.aggregate([
             { $sort: { updatedAt: -1 } },
         ]) : await Sale.aggregate([
-            { $match: { createdAt: { $gte: new Date(date) } } },
+            { $match: { createdAt: { $and: [{ $gte: new Date(date) }, { $gte: new Date(nextDate) }] } } },
             { $sort: { createdAt: -1 } },
             {
                 $addFields: {
@@ -73,7 +74,7 @@ module.exports.addDataToGoogleSheets = async (sheetId, SheetName) => {
                     "Discount Amount": element.discountAmount,
                     "MRPTotal": element.MRPTotal,
                     "SubTotal": element.subTotal,
-                    "TotalAmount": element.totalAmount,                   
+                    "TotalAmount": element.totalAmount,
                 }))
             }
         }
@@ -116,7 +117,7 @@ const writeWorksheetRows = async (worksheet, rows) => {
 
 exports.getFile = async (productImage, res) => {
     const credPaths = path.join(__dirname, '../productImages/' + productImage);
-    var imageAsBase64 = fs.readFileSync(credPaths);  
+    var imageAsBase64 = fs.readFileSync(credPaths);
 
-   return imageAsBase64.toString('base64')
+    return imageAsBase64.toString('base64')
 }

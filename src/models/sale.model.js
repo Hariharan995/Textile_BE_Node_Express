@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { CreditPoint } = require('.');
 
 const saleSchema = mongoose.Schema(
     {
