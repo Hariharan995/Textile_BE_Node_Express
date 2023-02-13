@@ -18,7 +18,7 @@ exports.createUser = async (reqBody) => {
         message: CONSTANT_MSG.AUTH.MOBILE_ALREADY_EXIST
       };
     }
-    reqBody.userStatus = reqBody.userRole === 'SELLER' ? 'UNAPPROVED' : 'APPROVED'
+    reqBody.userStatus = 'UNAPPROVED'
     reqBody.password = hashedpassword
     let user = User(reqBody)
     await user.save()
