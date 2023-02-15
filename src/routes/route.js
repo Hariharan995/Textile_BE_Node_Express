@@ -39,6 +39,7 @@ router.post('/userApproval', Authentication.checkJwtToken, Authentication.checkU
 router.get('/getCreditPoints', Authentication.checkJwtToken, Authentication.checkUserRole(), adminController.getCreditPoints);
 router.post('/updateCreditPoints', Authentication.checkJwtToken, Authentication.checkUserRole(), adminController.updateCreditPoints);
 router.post('/getSaleById', Authentication.checkJwtToken, adminController.getSaleById);
+router.post('/getDashboardDetails', Authentication.checkJwtToken, adminController.getDashboardDetails);
 
 // Seller Controller
 router.post('/addProduct', Authentication.checkJwtToken, Authentication.checkUserRole(), sellerController.addProduct);

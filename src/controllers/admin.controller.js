@@ -90,3 +90,13 @@ exports.getSaleById = async (req, res) => {
         return res.status(500).send({ statusCode: 500, status: CONSTANT_MSG.STATUS.ERROR, message: error.message });
     }
 };
+
+exports.getDashboardDetails = async (req, res) => {
+    try {
+        const sale = await adminService.getDashboardDetails(req.body);
+        return res.status(sale.statusCode).send(sale)
+    } catch (error) {
+        console.log("Error in getDashboardDetails API: ", error);
+        return res.status(500).send({ statusCode: 500, status: CONSTANT_MSG.STATUS.ERROR, message: error.message });
+    }
+};

@@ -443,3 +443,67 @@ exports.getSaleById = async (reqBody) => {
     }
 };
 
+exports.getDashboardDetails = async (req) => {
+    try {
+        let startDate = req?.startDate ? new Date(req.startDate) : new Date();
+        let endDate = req?.endDate ? new Date(req.endDate) : new Date();
+        if (!req.startDate) {
+            startDate.setDate(startDate.getDate() - 30);
+        }
+        endDate.setDate(endDate.getDate() + 1);
+        if (startDate) {
+            startDate = moment(startDate, "YYYY-MM-DD").toISOString()
+            startDate = startDate.slice(0, startDate.length - 1)
+        }
+        if (endDate) {
+            endDate = moment(endDate, "YYYY-MM-DD").toISOString()
+            endDate = endDate.slice(0, endDate.length - 1)
+        }
+        const orderDetails = await Sale.aggregate([
+            { $match: { "createdAt": { '$gte': new Date(startDate), '$lte': new Date(endDate) } } },
+            {
+                $group: {
+                    _id: 1,
+                    orderCount: { $sum: 1 },
+                    saleRevenue: { $sum: "$totalAmount" },
+                    discountRevenue: {
+                        "$sum": {
+                            "$cond":
+                            {
+                                "if": { $ne: ["$discountAmount", null] },
+                                "then": "$discountAmount",
+                                "else": 0
+                            }
+                        }
+                    },
+                    creditRevenue: {
+                        "$sum": {
+                            "$cond":
+                            {
+                                "if": { $ne: ["$creditAmount", null] },
+                                "then": "$creditAmount",
+                                "else": 0
+                            }
+                        }
+                    },
+                }
+            },
+            { $project: { _id: 0 } }
+        ])
+
+        return {
+            statusCode: 200,
+            status: CONSTANT_MSG.STATUS.SUCCESS,
+            message: CONSTANT_MSG.SALES.SALE_DETAILS,
+            data: orderDetails[0]
+        };
+
+    } catch (error) {
+        return {
+            statusCode: 500,
+            status: CONSTANT_MSG.STATUS.ERROR,
+            message: error.message,
+        };
+    }
+};
+

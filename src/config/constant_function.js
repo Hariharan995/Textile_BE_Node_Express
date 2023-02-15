@@ -15,7 +15,7 @@ module.exports.addDataToGoogleSheets = async (sheetId, SheetName) => {
         let list = SheetName === "Products" ? await Product.aggregate([
             { $sort: { updatedAt: -1 } },
         ]) : await Sale.aggregate([
-            { $match: { createdAt: { $and: [{ $gte: new Date(date) }, { $gte: new Date(nextDate) }] } } },
+            { $match: { createdAt: { $gte: new Date(date) ,  $gte: new Date(nextDate) } }},
             { $sort: { createdAt: -1 } },
             {
                 $addFields: {
