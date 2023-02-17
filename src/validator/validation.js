@@ -31,10 +31,7 @@ module.exports.getAllUsers = joi.object({
         startDate: joi.string().allow(''),
         endDate: joi.string().allow(''),
     }),
-    sortObj: joi.object({
-        createdAt: joi.number().valid(-1, 1),
-        name: joi.number().valid(-1, 1)
-    }).max(1)
+    sortObj: joi.object()
 });
 
 module.exports.getAllProducts = joi.object({
@@ -45,10 +42,7 @@ module.exports.getAllProducts = joi.object({
         startDate: joi.string().allow(''),
         endDate: joi.string().allow(''),
     }),
-    sortObj: joi.object({
-        createdAt: joi.number().valid(-1, 1),
-        name: joi.number().valid(-1, 1)
-    }).max(1)
+    sortObj: joi.object()
 });
 
 module.exports.getAllSales = joi.object({
@@ -60,10 +54,7 @@ module.exports.getAllSales = joi.object({
         startDate: joi.string().allow(''),
         endDate: joi.string().allow(''),
     }),
-    sortObj: joi.object({
-        createdAt: joi.number().valid(-1, 1),
-        name: joi.number().valid(-1, 1)
-    }).max(1)
+    sortObj: joi.object()
 });
 
 module.exports.userApproval = joi.object({
